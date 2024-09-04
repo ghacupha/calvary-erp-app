@@ -57,6 +57,23 @@ spring:
           - git-branch=${git.branch:}
       host: localhost
       port: 8500
+    stream:
+      kafka:
+        binder:
+          replicationFactor: 1
+          auto-create-topics: true
+          brokers: 10.60.27.22:29092
+      bindings:
+        binding-out-0:
+          content-type: text/plain
+          group: calvary-api-gateway
+        kafkaConsumer-in-0:
+          destination: sse-topic
+          content-type: text/plain
+          group: calvary-api-gateway
+        kafkaProducer-out-0:
+          content-type: text/plain
+          group: calvary-api-gateway
   elasticsearch:
     uris: http://localhost:9301
   liquibase:

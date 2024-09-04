@@ -106,6 +106,17 @@ jhipster:
   http:
     cache: # Used by the CachingHttpHeadersFilter
       timeToLiveInDays: 1461
+  cors:
+    # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
+    # The allowed origin that is dynamically configured just straight-out refused to work
+    #allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000,https://localhost:8981,http://localhost:8981,https://localhost:8984,http://localhost:8984,https://localhost:8982,http://localhost:8982,${app.SandboxInstance.urls}'
+    #allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000,https://localhost:8981,http://localhost:8981,${app.SandboxInstance.urls}'
+    allowed-origins: 'http://localhost:9000,https://localhost:9000,https://localhost:8981,http://localhost:8981,http://10.60.27.22:9000,http://localhost:8985,http://127.0.0.1:8985,http://127.0.0.1:8985,http://10.60.27.22:8985,${app.SandboxInstance.urls}'
+    allowed-methods: '*'
+    allowed-headers: '*'
+    exposed-headers: 'Origin,X-Requested-With,Authorization,Link,X-Total-Count,X-${jhipster.clientApp.name}-alert,X-${jhipster.clientApp.name}-error,X-${jhipster.clientApp.name}-params'
+    allow-credentials: true
+    max-age: 1800
   security:
     authentication:
       jwt:
@@ -137,3 +148,7 @@ jhipster:
 # ===================================================================
 
 # application:
+
+app:
+  SandboxInstance:
+    urls: ${SANDBOX_INSTANCE_URLS}

@@ -3,9 +3,12 @@ apply plugin: "war"
 bootWar {
     mainClass = "io.github.erp.CalvaryApiGatewayApp"
     includes = ["WEB-INF/**", "META-INF/**"]
+    webXml = file("${project.rootDir}/src/main/webapp/WEB-INF/web.xml")
 }
 
 war {
+    webAppDirName = "build/resources/main/static/"
+    webXml = file("${project.rootDir}/src/main/webapp/WEB-INF/web.xml")
     enabled = true
     archiveExtension = "war.original"
     includes = ["WEB-INF/**", "META-INF/**"]

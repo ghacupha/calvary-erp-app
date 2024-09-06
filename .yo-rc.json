@@ -23,9 +23,9 @@
     "jhipsterVersion": "8.7.0",
     "jwtSecretKey": "ZDRmZjUyNDY1MzhjNmQ3ZjA0NWY0Y2IwNWUwZGQyMDgzZTVhZTBjNzViMWFjMjEwNDQ0MTUxMDFhYThiOTQwNGQ4YTA1NzBlZjM3NjM0YmVlNGYxZTFhZGY2YjM0ZDFmMDJmOGMwOWRkNWEzMDk1OGYyZmVmM2I2ZWQ3MGNhYWE=",
     "languages": ["en", "fr", "de"],
+    "messageBroker": "kafka",
     "microfrontend": null,
     "microfrontends": [],
-    "messageBroker": "kafka",
     "nativeLanguage": "en",
     "packageName": "io.github.erp",
     "prodDatabaseType": "postgresql",
@@ -37,7 +37,7 @@
     "skipClient": false,
     "syncUserWithIdp": null,
     "testFrameworks": [],
-    "withAdminUi": true,
-    "websocket": false
+    "websocket": false,
+    "withAdminUi": true
   }
 }

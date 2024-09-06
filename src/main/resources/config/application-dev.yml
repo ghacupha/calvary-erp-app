@@ -41,6 +41,11 @@ spring:
   jackson:
     serialization:
       indent-output: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAPSERVERS}
+    admin:
+      properties:
+        replication.factor: ${KAFKA_REPLICATION_FACTOR}
   cloud:
     consul:
       config:
@@ -62,7 +67,7 @@ spring:
         binder:
           replicationFactor: 1
           auto-create-topics: true
-          brokers: 10.60.27.22:29092
+          brokers: ${KAFKA_BOOTSTRAPSERVERS}
       bindings:
         binding-out-0:
           content-type: text/plain
@@ -75,7 +80,8 @@ spring:
           content-type: text/plain
           group: calvary-api-gateway
   elasticsearch:
-    uris: http://localhost:9301
+    #uris: http://localhost:9301
+    uris: ${SPRING_DATA_JEST_URI}
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker

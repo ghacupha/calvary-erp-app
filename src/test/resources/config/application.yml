@@ -29,22 +29,6 @@ spring:
       enabled: false
     function:
       definition: kafkaConsumer;kafkaProducer
-    stream:
-      kafka:
-        binder:
-          replicationFactor: 1
-          auto-create-topics: true
-      bindings:
-        binding-out-0:
-          content-type: text/plain
-          group: calvary-api-gateway
-        kafkaConsumer-in-0:
-          destination: sse-topic
-          content-type: text/plain
-          group: calvary-api-gateway
-        kafkaProducer-out-0:
-          content-type: text/plain
-          group: calvary-api-gateway
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
   liquibase:
     contexts: test

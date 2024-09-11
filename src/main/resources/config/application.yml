@@ -132,23 +132,6 @@ spring:
           max-connections: 1000
     function:
       definition: kafkaConsumer;kafkaProducer
-    stream:
-      kafka:
-        binder:
-          replicationFactor: 1
-          auto-create-topics: true
-          brokers: localhost:9092
-      bindings:
-        binding-out-0:
-          content-type: text/plain
-          group: calvary-api-gateway
-        kafkaConsumer-in-0:
-          destination: sse-topic
-          content-type: text/plain
-          group: calvary-api-gateway
-        kafkaProducer-out-0:
-          content-type: text/plain
-          group: calvary-api-gateway
   profiles:
     # The commented value for `active` can be replaced with valid Spring profiles to load.
     # Otherwise, it will be filled in by gradle when building the JAR file

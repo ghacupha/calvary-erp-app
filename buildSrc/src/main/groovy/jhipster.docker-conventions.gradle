@@ -14,7 +14,7 @@ jib {
         }
     }
     to {
-        image = "calvaryapigateway:latest"
+        image = "ghacupha/calvary-api-gateway:latest"
     }
     container {
         entrypoint = ["bash", "-c", "/entrypoint.sh"]

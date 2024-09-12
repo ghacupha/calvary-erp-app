@@ -1,0 +1,44 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (institution(); as institutionRef) {
+      <div>
+        <h2 data-cy="institutionDetailsHeading"><span jhiTranslate="calvaryApiGatewayApp.institution.detail.title">Institution</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ institutionRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="calvaryApiGatewayApp.institution.institutionName">Institution Name</span></dt>
+          <dd>
+            <span>{{ institutionRef.institutionName }}</span>
+          </dd>
+          <dt><span jhiTranslate="calvaryApiGatewayApp.institution.parentInstitution">Parent Institution</span></dt>
+          <dd>
+            @if (institution()!.parentInstitution) {
+              <div>
+                <a [routerLink]="['/institution', institution()!.parentInstitution?.id, 'view']">{{
+                  institutionRef.parentInstitution?.institutionName
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/institution', institutionRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

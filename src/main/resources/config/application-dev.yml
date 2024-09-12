@@ -61,7 +61,7 @@ spring:
     uris: ${SPRING_DATA_JEST_URI} #uris: http://localhost:9301
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
-    contexts: dev, faker
+    contexts: dev #, faker
     url: ${LOCAL_PG_SERVER}/calvaryApiGatewayDev
   mail:
     host: smtp.gmail.com

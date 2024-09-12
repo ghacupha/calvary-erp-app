@@ -204,10 +204,3 @@ task cleanResources(type: Delete) {
 
 compileJava.dependsOn processResources
 processResources.dependsOn bootBuildInfo
-
-jib {
-  to {
-    image = 'ghacupha/calvary-api-gateway'
-  }
-}
-

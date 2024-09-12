@@ -58,7 +58,7 @@ spring:
       host: localhost
       port: 8500
   elasticsearch:
-    uris: ${SPRING_DATA_JEST_URI} #uris: http://localhost:9301
+    uris: ${SPRING_DATA_JEST_URI_DEV_CALVARY} #uris: http://localhost:9301
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev #, faker

@@ -1,0 +1,58 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (institutionalSubscription(); as institutionalSubscriptionRef) {
+      <div>
+        <h2 data-cy="institutionalSubscriptionDetailsHeading">
+          <span jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.detail.title">Institutional Subscription</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ institutionalSubscriptionRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.startDate">Start Date</span></dt>
+          <dd>
+            <span>{{ institutionalSubscriptionRef.startDate | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.expiryDate">Expiry Date</span></dt>
+          <dd>
+            <span>{{ institutionalSubscriptionRef.expiryDate | formatMediumDate }}</span>
+          </dd>
+          <dt><span jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.memberLimit">Member Limit</span></dt>
+          <dd>
+            <span>{{ institutionalSubscriptionRef.memberLimit }}</span>
+          </dd>
+          <dt><span jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.institution">Institution</span></dt>
+          <dd>
+            @if (institutionalSubscription()!.institution) {
+              <div>
+                <a [routerLink]="['/institution', institutionalSubscription()!.institution?.id, 'view']">{{
+                  institutionalSubscriptionRef.institution?.institutionName
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+        </button>
+
+        <button
+          type="button"
+          [routerLink]="['/institutional-subscription', institutionalSubscriptionRef.id, 'edit']"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

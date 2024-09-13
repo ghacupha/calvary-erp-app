@@ -122,6 +122,21 @@
                       >Show Institution</span
                     >
                   </button>
+                  <button
+                    type="submit"
+                    [routerLink]="['/institutional-subscription']"
+                    [queryParams]="{ 'filter[institutionId.in]': institution.id }"
+                    class="btn btn-info btn-sm"
+                    data-cy="filterOtherEntityButton"
+                  >
+                    <fa-icon icon="eye"></fa-icon>
+                    <span
+                      class="d-none d-md-inline"
+                      jhiTranslate="entity.action.show"
+                      [translateValues]="{ otherEntity: ('calvaryApiGatewayApp.institution.institutionalSubscription' | translate) }"
+                      >Show Institutional Subscription</span
+                    >
+                  </button>
                   <a [routerLink]="['/institution', institution.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
                     <fa-icon icon="eye"></fa-icon>
                     <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>

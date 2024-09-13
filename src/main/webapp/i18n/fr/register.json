@@ -2,10 +2,7 @@
   "register": {
     "title": "Création de compte utilisateur",
     "form": {
-      "button": "Enregistrement",
-      "institution": {
-        "label": "Organisme"
-      }
+      "button": "Enregistrement"
     },
     "messages": {
       "validate": {

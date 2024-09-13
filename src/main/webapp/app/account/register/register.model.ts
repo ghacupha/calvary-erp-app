@@ -7,5 +7,6 @@ export class Registration {
     public password: string,
     public langKey: string,
     // public institution: IInstitution,
+    public institution: Pick<IInstitution, 'id' | 'institutionName'> | null,
   ) {}
 }

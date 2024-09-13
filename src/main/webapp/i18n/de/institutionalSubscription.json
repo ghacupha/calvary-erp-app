@@ -1,0 +1,28 @@
+{
+  "calvaryApiGatewayApp": {
+    "institutionalSubscription": {
+      "home": {
+        "title": "Institutional Subscriptions",
+        "refreshListLabel": "Liste aktualisieren",
+        "createLabel": "Institutional Subscription erstellen",
+        "createOrEditLabel": "Institutional Subscription erstellen oder bearbeiten",
+        "search": "Suche nach Institutional Subscription",
+        "notFound": "Keine Institutional Subscriptions gefunden"
+      },
+      "created": "Institutional Subscription erstellt mit ID {{ param }}",
+      "updated": "Institutional Subscription aktualisiert mit ID {{ param }}",
+      "deleted": "Institutional Subscription gelöscht mit ID {{ param }}",
+      "delete": {
+        "question": "Soll Institutional Subscription {{ id }} wirklich dauerhaft gelöscht werden?"
+      },
+      "detail": {
+        "title": "Institutional Subscription"
+      },
+      "id": "ID",
+      "startDate": "Start Date",
+      "expiryDate": "Expiry Date",
+      "memberLimit": "Member Limit",
+      "institution": "Institution"
+    }
+  }
+}

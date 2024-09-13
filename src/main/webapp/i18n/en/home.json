@@ -1,7 +1,7 @@
 {
   "home": {
-    "title": "Calvary API Gateway",
-    "subtitle": "Gateway for Calvary ERP",
+    "title": "Welcome, Java Hipster!",
+    "subtitle": "This is your homepage",
     "logged": {
       "message": "You are logged in as user \"{{username}}\"."
     },

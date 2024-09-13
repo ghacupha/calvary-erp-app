@@ -9,7 +9,7 @@
         "main": "Entités",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
         "institution": "Institution",
-        "adminAuthority": "Autorité"
+        "institutionalSubscription": "Institutional Subscription"
       },
       "account": {
         "main": "Compte",

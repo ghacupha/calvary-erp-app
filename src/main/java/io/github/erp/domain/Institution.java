@@ -30,12 +30,16 @@ public class Institution implements Serializable {
     private String institutionName;
 
     @Transient
-    @JsonIgnoreProperties(value = { "parentInstitution", "institutions" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "parentInstitution", "institutions", "institutionalSubscriptions" }, allowSetters = true)
     private Institution parentInstitution;
 
     @Transient
-    @JsonIgnoreProperties(value = { "parentInstitution", "institutions" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "parentInstitution", "institutions", "institutionalSubscriptions" }, allowSetters = true)
     private Set<Institution> institutions = new HashSet<>();
+
+    @Transient
+    @JsonIgnoreProperties(value = { "institution" }, allowSetters = true)
+    private Set<InstitutionalSubscription> institutionalSubscriptions = new HashSet<>();
 
     @Column("parent_institution_id")
     private Long parentInstitutionId;
@@ -110,6 +114,37 @@ public class Institution implements Serializable {
     public Institution removeInstitution(Institution institution) {
         this.institutions.remove(institution);
         institution.setParentInstitution(null);
+        return this;
+    }
+
+    public Set<InstitutionalSubscription> getInstitutionalSubscriptions() {
+        return this.institutionalSubscriptions;
+    }
+
+    public void setInstitutionalSubscriptions(Set<InstitutionalSubscription> institutionalSubscriptions) {
+        if (this.institutionalSubscriptions != null) {
+            this.institutionalSubscriptions.forEach(i -> i.setInstitution(null));
+        }
+        if (institutionalSubscriptions != null) {
+            institutionalSubscriptions.forEach(i -> i.setInstitution(this));
+        }
+        this.institutionalSubscriptions = institutionalSubscriptions;
+    }
+
+    public Institution institutionalSubscriptions(Set<InstitutionalSubscription> institutionalSubscriptions) {
+        this.setInstitutionalSubscriptions(institutionalSubscriptions);
+        return this;
+    }
+
+    public Institution addInstitutionalSubscription(InstitutionalSubscription institutionalSubscription) {
+        this.institutionalSubscriptions.add(institutionalSubscription);
+        institutionalSubscription.setInstitution(this);
+        return this;
+    }
+
+    public Institution removeInstitutionalSubscription(InstitutionalSubscription institutionalSubscription) {
+        this.institutionalSubscriptions.remove(institutionalSubscription);
+        institutionalSubscription.setInstitution(null);
         return this;
     }
 

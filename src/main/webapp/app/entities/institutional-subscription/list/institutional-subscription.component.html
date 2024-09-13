@@ -1,0 +1,183 @@
+<div>
+  <h2 id="page-heading" data-cy="InstitutionalSubscriptionHeading">
+    <span jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.home.title">Institutional Subscriptions</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.home.refreshListLabel">Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-institutional-subscription"
+        [routerLink]="['/institutional-subscription/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span class="hidden-sm-down" jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.home.createLabel"
+          >Create a new Institutional Subscription</span
+        >
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <form name="searchForm" class="row row-cols-sm-auto align-items-center">
+    <div class="col-sm-12">
+      <div class="input-group w-100 mt-3">
+        <label class="visually-hidden" for="currentSearch" jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.home.search"
+          >Search for Institutional Subscription</label
+        >
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="currentSearch"
+          id="currentSearch"
+          name="currentSearch"
+          placeholder="{{ 'calvaryApiGatewayApp.institutionalSubscription.home.search' | translate }}"
+        />
+
+        <button class="btn btn-info" (click)="search(currentSearch)">
+          <fa-icon icon="search"></fa-icon>
+        </button>
+
+        @if (currentSearch) {
+          <button class="btn btn-danger" (click)="search('')">
+            <fa-icon icon="trash-alt"></fa-icon>
+          </button>
+        }
+      </div>
+    </div>
+  </form>
+
+  <jhi-filter [filters]="filters"></jhi-filter>
+
+  @if (institutionalSubscriptions?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.home.notFound">No Institutional Subscriptions found</span>
+    </div>
+  }
+
+  @if (institutionalSubscriptions && institutionalSubscriptions.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span jhiTranslate="global.field.id">ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="startDate">
+              <div class="d-flex">
+                <span jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.startDate">Start Date</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="expiryDate">
+              <div class="d-flex">
+                <span jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.expiryDate">Expiry Date</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="memberLimit">
+              <div class="d-flex">
+                <span jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.memberLimit">Member Limit</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="institution.institutionName">
+              <div class="d-flex">
+                <span jhiTranslate="calvaryApiGatewayApp.institutionalSubscription.institution">Institution</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (institutionalSubscription of institutionalSubscriptions; track trackId) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/institutional-subscription', institutionalSubscription.id, 'view']">{{
+                  institutionalSubscription.id
+                }}</a>
+              </td>
+              <td>{{ institutionalSubscription.startDate | formatMediumDate }}</td>
+              <td>{{ institutionalSubscription.expiryDate | formatMediumDate }}</td>
+              <td>{{ institutionalSubscription.memberLimit }}</td>
+              <td>
+                @if (institutionalSubscription.institution) {
+                  <div>
+                    <a [routerLink]="['/institution', institutionalSubscription.institution.id, 'view']">{{
+                      institutionalSubscription.institution.institutionName
+                    }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/institutional-subscription', institutionalSubscription.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/institutional-subscription', institutionalSubscription.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                  </a>
+
+                  <button
+                    type="submit"
+                    (click)="delete(institutionalSubscription)"
+                    class="btn btn-danger btn-sm"
+                    data-cy="entityDeleteButton"
+                  >
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (institutionalSubscriptions && institutionalSubscriptions.length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page, totalItems: totalItems, itemsPerPage: itemsPerPage }"></jhi-item-count>
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems"
+          [page]="page"
+          [pageSize]="itemsPerPage"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        ></ngb-pagination>
+      </div>
+    </div>
+  }
+</div>

@@ -2,6 +2,7 @@ package io.github.erp.domain;
 
 import static io.github.erp.domain.InstitutionTestSamples.*;
 import static io.github.erp.domain.InstitutionTestSamples.*;
+import static io.github.erp.domain.InstitutionalSubscriptionTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.erp.web.rest.TestUtil;
@@ -57,5 +58,27 @@ class InstitutionTest {
         institution.setInstitutions(new HashSet<>());
         assertThat(institution.getInstitutions()).doesNotContain(institutionBack);
         assertThat(institutionBack.getParentInstitution()).isNull();
+    }
+
+    @Test
+    void institutionalSubscriptionTest() {
+        Institution institution = getInstitutionRandomSampleGenerator();
+        InstitutionalSubscription institutionalSubscriptionBack = getInstitutionalSubscriptionRandomSampleGenerator();
+
+        institution.addInstitutionalSubscription(institutionalSubscriptionBack);
+        assertThat(institution.getInstitutionalSubscriptions()).containsOnly(institutionalSubscriptionBack);
+        assertThat(institutionalSubscriptionBack.getInstitution()).isEqualTo(institution);
+
+        institution.removeInstitutionalSubscription(institutionalSubscriptionBack);
+        assertThat(institution.getInstitutionalSubscriptions()).doesNotContain(institutionalSubscriptionBack);
+        assertThat(institutionalSubscriptionBack.getInstitution()).isNull();
+
+        institution.institutionalSubscriptions(new HashSet<>(Set.of(institutionalSubscriptionBack)));
+        assertThat(institution.getInstitutionalSubscriptions()).containsOnly(institutionalSubscriptionBack);
+        assertThat(institutionalSubscriptionBack.getInstitution()).isEqualTo(institution);
+
+        institution.setInstitutionalSubscriptions(new HashSet<>());
+        assertThat(institution.getInstitutionalSubscriptions()).doesNotContain(institutionalSubscriptionBack);
+        assertThat(institutionalSubscriptionBack.getInstitution()).isNull();
     }
 }

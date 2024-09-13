@@ -21,7 +21,8 @@
       "id": "ID",
       "institutionName": "Institution Name",
       "parentInstitution": "Parent Institution",
-      "institution": "Institution"
+      "institution": "Institution",
+      "institutionalSubscription": "Institutional Subscription"
     }
   }
 }

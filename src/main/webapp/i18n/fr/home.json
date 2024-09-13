@@ -1,7 +1,7 @@
 {
   "home": {
-    "title": "Passerelle API de Calvary",
-    "subtitle": "Passerelle pour la plateforme de ressources d’entreprise Calvary",
+    "title": "Bienvenue, Java Hipster !",
+    "subtitle": "Ceci est votre page d'accueil",
     "logged": {
       "message": "Vous êtes connecté en tant que \"{{username}}\"."
     },

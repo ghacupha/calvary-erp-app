@@ -45,10 +45,10 @@ describe('Institution Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call Institution query and add missing value', () => {
       const institution: IInstitution = { id: 456 };
-      const parentInstitution: IInstitution = { id: 26579 };
+      const parentInstitution: IInstitution = { id: 18573 };
       institution.parentInstitution = parentInstitution;
 
-      const institutionCollection: IInstitution[] = [{ id: 20002 }];
+      const institutionCollection: IInstitution[] = [{ id: 16202 }];
       jest.spyOn(institutionService, 'query').mockReturnValue(of(new HttpResponse({ body: institutionCollection })));
       const additionalInstitutions = [parentInstitution];
       const expectedCollection: IInstitution[] = [...additionalInstitutions, ...institutionCollection];
@@ -67,7 +67,7 @@ describe('Institution Management Update Component', () => {
 
     it('Should update editForm', () => {
       const institution: IInstitution = { id: 456 };
-      const parentInstitution: IInstitution = { id: 24607 };
+      const parentInstitution: IInstitution = { id: 10167 };
       institution.parentInstitution = parentInstitution;
 
       activatedRoute.data = of({ institution });

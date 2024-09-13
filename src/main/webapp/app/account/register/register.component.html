@@ -37,6 +37,14 @@
     <div class="col-md-8">
       @if (!success()) {
         <form name="form" (ngSubmit)="register()" [formGroup]="registerForm">
+          <!-- Institution Selection -->
+          <div class="mb-3">
+            <label class="form-label" for="institution" jhiTranslate="register.form.institution.label">Institution</label>
+            <select class="form-control" id="institution" name="institution" formControlName="institution" data-cy="institution">
+              <option *ngFor="let institution of institutions" [value]="institution.id">{{ institution.institutionName }}</option>
+            </select>
+          </div>
+
           <div class="mb-3">
             <label class="form-label" for="login" jhiTranslate="global.form.username.label">Username</label>
             <input

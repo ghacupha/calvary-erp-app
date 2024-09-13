@@ -2,14 +2,17 @@ package io.github.erp.service;
 
 import io.github.erp.config.Constants;
 import io.github.erp.domain.Authority;
+import io.github.erp.domain.Institution;
 import io.github.erp.domain.User;
 import io.github.erp.repository.AuthorityRepository;
+import io.github.erp.repository.InstitutionRepository;
 import io.github.erp.repository.UserRepository;
 import io.github.erp.repository.search.UserSearchRepository;
 import io.github.erp.security.AuthoritiesConstants;
 import io.github.erp.security.SecurityUtils;
 import io.github.erp.service.dto.AdminUserDTO;
 import io.github.erp.service.dto.UserDTO;
+import io.github.erp.service.mapper.InstitutionMapper;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -43,16 +46,24 @@ public class UserService {
 
     private final AuthorityRepository authorityRepository;
 
+    private final InstitutionService institutionService;
+
+    private final InstitutionMapper institutionMapper;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         UserSearchRepository userSearchRepository,
-        AuthorityRepository authorityRepository
+        AuthorityRepository authorityRepository,
+        InstitutionService institutionService,
+        InstitutionMapper institutionMapper
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userSearchRepository = userSearchRepository;
         this.authorityRepository = authorityRepository;
+        this.institutionService = institutionService;
+        this.institutionMapper = institutionMapper;
     }
 
     @Transactional
@@ -148,6 +159,13 @@ public class UserService {
                     .map(authorities::add)
                     .thenReturn(newUser)
                     .doOnNext(user -> user.setAuthorities(authorities))
+                    .flatMap(user -> {
+                        return institutionService
+                            .findOne(userDTO.institutionId())
+                            .switchIfEmpty(Mono.error(new IllegalArgumentException("Invalid institution ID")))
+                            .doOnNext(institution -> user.setInstitution(institutionMapper.toEntity(institution)))
+                            .thenReturn(user);
+                    })
                     .flatMap(this::saveUser)
                     .flatMap(user -> userSearchRepository.save(user).thenReturn(user))
                     .doOnNext(user -> LOG.debug("Created Information for User: {}", user));
@@ -169,22 +187,29 @@ public class UserService {
         } else {
             user.setLangKey(userDTO.getLangKey());
         }
-        return Flux.fromIterable(userDTO.getAuthorities() != null ? userDTO.getAuthorities() : new HashSet<>())
-            .flatMap(authorityRepository::findById)
-            .doOnNext(authority -> user.getAuthorities().add(authority))
-            .then(Mono.just(user))
-            .publishOn(Schedulers.boundedElastic())
-            .map(newUser -> {
-                String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
-                newUser.setPassword(encryptedPassword);
-                newUser.setResetKey(RandomUtil.generateResetKey());
-                newUser.setResetDate(Instant.now());
-                newUser.setActivated(true);
-                return newUser;
-            })
-            .flatMap(this::saveUser)
-            .flatMap(user1 -> userSearchRepository.save(user1).thenReturn(user1))
-            .doOnNext(user1 -> LOG.debug("Created Information for User: {}", user1));
+
+        return institutionService
+            .findOne(userDTO.institutionId())
+            .switchIfEmpty(Mono.error(new IllegalArgumentException("Invalid institution ID")))
+            .flatMap(institution -> {
+                user.setInstitution(institutionMapper.toEntity(institution));
+                return Flux.fromIterable(userDTO.getAuthorities() != null ? userDTO.getAuthorities() : new HashSet<>())
+                    .flatMap(authorityRepository::findById)
+                    .doOnNext(authority -> user.getAuthorities().add(authority))
+                    .then(Mono.just(user))
+                    .publishOn(Schedulers.boundedElastic())
+                    .map(newUser -> {
+                        String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
+                        newUser.setPassword(encryptedPassword);
+                        newUser.setResetKey(RandomUtil.generateResetKey());
+                        newUser.setResetDate(Instant.now());
+                        newUser.setActivated(true);
+                        return newUser;
+                    })
+                    .flatMap(this::saveUser)
+                    .flatMap(user1 -> userSearchRepository.save(user1).thenReturn(user1))
+                    .doOnNext(user1 -> LOG.debug("Created Information for User: {}", user1));
+            });
     }
 
     /**
@@ -195,31 +220,37 @@ public class UserService {
      */
     @Transactional
     public Mono<AdminUserDTO> updateUser(AdminUserDTO userDTO) {
-        return userRepository
-            .findById(userDTO.getId())
-            .flatMap(user -> {
-                user.setLogin(userDTO.getLogin().toLowerCase());
-                user.setFirstName(userDTO.getFirstName());
-                user.setLastName(userDTO.getLastName());
-                if (userDTO.getEmail() != null) {
-                    user.setEmail(userDTO.getEmail().toLowerCase());
-                }
-                user.setImageUrl(userDTO.getImageUrl());
-                user.setActivated(userDTO.isActivated());
-                user.setLangKey(userDTO.getLangKey());
-                Set<Authority> managedAuthorities = user.getAuthorities();
-                managedAuthorities.clear();
+        return institutionService
+            .findOne(userDTO.institutionId())
+            .switchIfEmpty(Mono.error(new IllegalArgumentException("Invalid institution ID")))
+            .flatMap(institution -> {
+                userDTO.setInstitution(institution);
                 return userRepository
-                    .deleteUserAuthorities(user.getId())
-                    .thenMany(Flux.fromIterable(userDTO.getAuthorities()))
-                    .flatMap(authorityRepository::findById)
-                    .map(managedAuthorities::add)
-                    .then(Mono.just(user));
-            })
-            .flatMap(this::saveUser)
-            .flatMap(user -> userSearchRepository.save(user).thenReturn(user))
-            .doOnNext(user -> LOG.debug("Changed Information for User: {}", user))
-            .map(AdminUserDTO::new);
+                    .findById(userDTO.getId())
+                    .flatMap(user -> {
+                        user.setLogin(userDTO.getLogin().toLowerCase());
+                        user.setFirstName(userDTO.getFirstName());
+                        user.setLastName(userDTO.getLastName());
+                        if (userDTO.getEmail() != null) {
+                            user.setEmail(userDTO.getEmail().toLowerCase());
+                        }
+                        user.setImageUrl(userDTO.getImageUrl());
+                        user.setActivated(userDTO.isActivated());
+                        user.setLangKey(userDTO.getLangKey());
+                        Set<Authority> managedAuthorities = user.getAuthorities();
+                        managedAuthorities.clear();
+                        return userRepository
+                            .deleteUserAuthorities(user.getId())
+                            .thenMany(Flux.fromIterable(userDTO.getAuthorities()))
+                            .flatMap(authorityRepository::findById)
+                            .map(managedAuthorities::add)
+                            .then(Mono.just(user));
+                    })
+                    .flatMap(this::saveUser)
+                    .flatMap(user -> userSearchRepository.save(user).thenReturn(user))
+                    .doOnNext(user -> LOG.debug("Changed Information for User: {}", user))
+                    .map(AdminUserDTO::new);
+            });
     }
 
     @Transactional
@@ -243,7 +274,7 @@ public class UserService {
      * @return a completed {@link Mono}.
      */
     @Transactional
-    public Mono<Void> updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
+    public Mono<Void> updateUser(String firstName, String lastName, String email, String langKey, String imageUrl, Long institutionId) {
         return SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .flatMap(user -> {
@@ -254,8 +285,14 @@ public class UserService {
                 }
                 user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
-                return saveUser(user);
+
+                return institutionService
+                    .findOne(institutionId)
+                    .switchIfEmpty(Mono.error(new IllegalArgumentException("Invalid institution ID")))
+                    .doOnNext(institution -> user.setInstitution(institutionMapper.toEntity(institution)))
+                    .thenReturn(user);
             })
+            .flatMap(this::saveUser)
             .flatMap(user -> userSearchRepository.save(user).thenReturn(user))
             .doOnNext(user -> LOG.debug("Changed Information for User: {}", user))
             .then();

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, signal, viewChild, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,6 +8,8 @@ import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from 'app/config/err
 import SharedModule from 'app/shared/shared.module';
 import PasswordStrengthBarComponent from '../password/password-strength-bar/password-strength-bar.component';
 import { RegisterService } from './register.service';
+import { IInstitution } from '../../entities/institution/institution.model';
+import { InstitutionService } from '../../entities/institution/service/institution.service';
 
 @Component({
   standalone: true,
@@ -15,7 +17,7 @@ import { RegisterService } from './register.service';
   imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent],
   templateUrl: './register.component.html',
 })
-export default class RegisterComponent implements AfterViewInit {
+export default class RegisterComponent implements AfterViewInit, OnInit {
   login = viewChild.required<ElementRef>('login');
 
   doNotMatch = signal(false);
@@ -24,7 +26,13 @@ export default class RegisterComponent implements AfterViewInit {
   errorUserExists = signal(false);
   success = signal(false);
 
+  institutions: IInstitution[] = [];
+
   registerForm = new FormGroup({
+    institution: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
     login: new FormControl('', {
       nonNullable: true,
       validators: [
@@ -50,9 +58,16 @@ export default class RegisterComponent implements AfterViewInit {
 
   private translateService = inject(TranslateService);
   private registerService = inject(RegisterService);
+  private institutionService = inject(InstitutionService);
 
   ngAfterViewInit(): void {
     this.login().nativeElement.focus();
+  }
+
+  ngOnInit(): void {
+    this.institutionService.query().subscribe(response => {
+      this.institutions = response.body ?? [];
+    });
   }
 
   register(): void {
@@ -65,7 +80,7 @@ export default class RegisterComponent implements AfterViewInit {
     if (password !== confirmPassword) {
       this.doNotMatch.set(true);
     } else {
-      const { login, email } = this.registerForm.getRawValue();
+      const { login, email, institution } = this.registerForm.getRawValue();
       this.registerService
         .save({ login, email, password, langKey: this.translateService.currentLang })
         .subscribe({ next: () => this.success.set(true), error: response => this.processError(response) });

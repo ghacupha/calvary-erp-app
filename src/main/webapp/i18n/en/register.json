@@ -2,7 +2,10 @@
   "register": {
     "title": "Registration",
     "form": {
-      "button": "Register"
+      "button": "Register",
+      "institution": {
+        "label": "Institution"
+      }
     },
     "messages": {
       "validate": {

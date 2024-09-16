@@ -8,7 +8,7 @@ import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from 'app/config/err
 import SharedModule from 'app/shared/shared.module';
 import PasswordStrengthBarComponent from '../password/password-strength-bar/password-strength-bar.component';
 import { RegisterService } from './register.service';
-import { IInstitution } from '../../entities/institution/institution.model';
+import { IInstitution, NewInstitution } from '../../entities/institution/institution.model';
 import { InstitutionService } from '../../entities/institution/service/institution.service';
 
 @Component({
@@ -29,10 +29,6 @@ export default class RegisterComponent implements AfterViewInit, OnInit {
   institutions: IInstitution[] = [];
 
   registerForm = new FormGroup({
-    institution: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required],
-    }),
     login: new FormControl('', {
       nonNullable: true,
       validators: [
@@ -53,6 +49,10 @@ export default class RegisterComponent implements AfterViewInit, OnInit {
     confirmPassword: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)],
+    }),
+    institution: new FormControl(null, {
+      nonNullable: true,
+      validators: [Validators.required],
     }),
   });
 
@@ -82,7 +82,7 @@ export default class RegisterComponent implements AfterViewInit, OnInit {
     } else {
       const { login, email, institution } = this.registerForm.getRawValue();
       this.registerService
-        .save({ login, email, password, langKey: this.translateService.currentLang })
+        .save({ login, email, password, langKey: this.translateService.currentLang, institution })
         .subscribe({ next: () => this.success.set(true), error: response => this.processError(response) });
     }
   }

@@ -51,8 +51,6 @@ public class AdminUserDTO implements Serializable {
 
     private Set<String> authorities;
 
-    private InstitutionDTO institution;
-
     public AdminUserDTO() {
         // Empty constructor needed for Jackson.
     }
@@ -177,19 +175,6 @@ public class AdminUserDTO implements Serializable {
         this.authorities = authorities;
     }
 
-    public InstitutionDTO institution() {
-        return institution;
-    }
-
-    public Long institutionId() {
-        return institution.getId();
-    }
-
-    public AdminUserDTO setInstitution(InstitutionDTO institution) {
-        this.institution = institution;
-        return this;
-    }
-
     // prettier-ignore
     @Override
     public String toString() {
@@ -197,7 +182,6 @@ public class AdminUserDTO implements Serializable {
             "login='" + login + '\'' +
             ", firstName='" + firstName + '\'' +
             ", lastName='" + lastName + '\'' +
-            ", institution='" + institution + '\'' +
             ", email='" + email + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
             ", activated=" + activated +

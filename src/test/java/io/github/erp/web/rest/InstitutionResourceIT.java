@@ -85,8 +85,8 @@ class InstitutionResourceIT {
 
     private Institution insertedInstitution;
 
-    @Autowired
-    private InstitutionRepository institutionRepository;
+    //    @Autowired
+    //    private InstitutionRepository institutionRepository;
 
     /**
      * Create an entity for this test.
@@ -573,8 +573,6 @@ class InstitutionResourceIT {
         // Update the institution using partial update
         Institution partialUpdatedInstitution = new Institution();
         partialUpdatedInstitution.setId(institution.getId());
-
-        partialUpdatedInstitution.institutionName(UPDATED_INSTITUTION_NAME);
 
         webTestClient
             .patch()

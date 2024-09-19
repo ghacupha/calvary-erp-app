@@ -2,8 +2,6 @@ package io.github.erp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.github.erp.config.Constants;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -81,10 +79,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @JsonIgnore
     @Transient
     private Set<Authority> authorities = new HashSet<>();
-
-    @ManyToOne
-    @JoinColumn(name = "institution_id")
-    private Institution institution;
 
     public Long getId() {
         return id;
@@ -189,15 +183,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setAuthorities(Set<Authority> authorities) {
         this.authorities = authorities;
-    }
-
-    public Institution institution() {
-        return institution;
-    }
-
-    public User setInstitution(Institution institution) {
-        this.institution = institution;
-        return this;
     }
 
     @Override

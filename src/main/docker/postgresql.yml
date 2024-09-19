@@ -4,9 +4,9 @@ services:
   postgresql:
     image: postgres:16.4
     # volumes:
-    #   - ~/volumes/jhipster/calvaryApiGateway/postgresql/:/var/lib/postgresql/data/
+    #   - ~/volumes/jhipster/calvaryErpApi/postgresql/:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=calvaryApiGateway
+      - POSTGRES_USER=calvaryErpApi
       - POSTGRES_PASSWORD=
       - POSTGRES_HOST_AUTH_METHOD=trust
     healthcheck:

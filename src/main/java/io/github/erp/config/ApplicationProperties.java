@@ -3,7 +3,7 @@ package io.github.erp.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Properties specific to Calvary Api Gateway.
+ * Properties specific to Calvary Erp Api.
  * <p>
  * Properties are configured in the {@code application.yml} file.
  * See {@link tech.jhipster.config.JHipsterProperties} for a good example.

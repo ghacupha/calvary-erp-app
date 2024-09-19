@@ -137,7 +137,9 @@ public class UserResource {
             .map(user -> {
                 try {
                     return ResponseEntity.created(new URI("/api/admin/users/" + user.getLogin()))
-                        .headers(HeaderUtil.createAlert(applicationName, "userManagement.created", user.getLogin()))
+                        .headers(
+                            HeaderUtil.createAlert(applicationName, "A user is created with identifier " + user.getLogin(), user.getLogin())
+                        )
                         .body(user);
                 } catch (URISyntaxException e) {
                     throw new RuntimeException(e);
@@ -181,7 +183,13 @@ public class UserResource {
             .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
             .map(user ->
                 ResponseEntity.ok()
-                    .headers(HeaderUtil.createAlert(applicationName, "userManagement.updated", userDTO.getLogin()))
+                    .headers(
+                        HeaderUtil.createAlert(
+                            applicationName,
+                            "A user is updated with identifier " + userDTO.getLogin(),
+                            userDTO.getLogin()
+                        )
+                    )
                     .body(user)
             );
     }
@@ -250,7 +258,9 @@ public class UserResource {
             .deleteUser(login)
             .then(
                 Mono.just(
-                    ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, "userManagement.deleted", login)).build()
+                    ResponseEntity.noContent()
+                        .headers(HeaderUtil.createAlert(applicationName, "A user is deleted with identifier " + login, login))
+                        .build()
                 )
             );
     }

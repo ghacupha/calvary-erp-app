@@ -852,6 +852,8 @@ class InstitutionalSubscriptionResourceIT {
         InstitutionalSubscription partialUpdatedInstitutionalSubscription = new InstitutionalSubscription();
         partialUpdatedInstitutionalSubscription.setId(institutionalSubscription.getId());
 
+        partialUpdatedInstitutionalSubscription.expiryDate(UPDATED_EXPIRY_DATE);
+
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, partialUpdatedInstitutionalSubscription.getId())

@@ -151,9 +151,3 @@ Desktop.ini
 ######################
 /coverage/
 /.nyc_output/
-
-######################
-# Elasticsearch index
-######################
-/src/main/docker/search-index-directory/
-

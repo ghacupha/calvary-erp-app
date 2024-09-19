@@ -15,10 +15,7 @@
 
 spring:
   application:
-    name: calvaryApiGateway
-  autoconfigure:
-    exclude:
-      - org.springframework.cloud.gateway.config.GatewayMetricsAutoConfiguration
+    name: calvaryErpApi
   cloud:
     consul:
       discovery:
@@ -47,13 +44,13 @@ spring:
           authorities-claim-name: auth
   task:
     execution:
-      thread-name-prefix: calvary-api-gateway-task-
+      thread-name-prefix: calvary-erp-api-task-
       pool:
         core-size: 1
         max-size: 50
         queue-capacity: 10000
     scheduling:
-      thread-name-prefix: calvary-api-gateway-scheduling-
+      thread-name-prefix: calvary-erp-api-scheduling-
       pool:
         size: 20
   thymeleaf:
@@ -70,9 +67,9 @@ server:
 # ===================================================================
 jhipster:
   clientApp:
-    name: 'calvaryApiGatewayApp'
+    name: 'calvaryErpApiApp'
   mail:
-    from: calvaryApiGateway@localhost.com
+    from: calvaryErpApi@localhost.com
     base-url: http://127.0.0.1:8080
   logging:
     # To test json console appender
@@ -86,7 +83,7 @@ jhipster:
     authentication:
       jwt:
         # This token must be encoded using Base64 (you can type `echo 'secret-key'|base64` on your command line)
-        base64-secret: ZDRmZjUyNDY1MzhjNmQ3ZjA0NWY0Y2IwNWUwZGQyMDgzZTVhZTBjNzViMWFjMjEwNDQ0MTUxMDFhYThiOTQwNGQ4YTA1NzBlZjM3NjM0YmVlNGYxZTFhZGY2YjM0ZDFmMDJmOGMwOWRkNWEzMDk1OGYyZmVmM2I2ZWQ3MGNhYWE=
+        base64-secret: N2YzMzE1MmI3YTE2NWM1OWM0ZjNlMjFlNTNiNzM3ZTNmOTk0YzFhYTgzYjhjZjZiNjY0MzU4YjA4ZDhjMzY5MTdmZTE0YWM4ZDdlMjYwN2VkZDIxOTdmZGE2MWE4Y2E0NjUwZmVlMjAxMzBkYTM3YmIwNGI0MTM2ZTRhYmY0MDg=
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 86400

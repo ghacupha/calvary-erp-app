@@ -2,7 +2,7 @@
 version: '3.3'
 services:
   calvary-gateway-api:
-    image: ghacupha/calvary-api-gateway
+    image: ghacupha/calvary-erp-api
     volumes:
       - ./logs/:/logs/
       - ./reports-directory/:/reports-directory/
@@ -58,11 +58,3 @@ services:
 #    extends:
 #      file: ./consul.yml
 #      service: consul-config-loader
-#  kafka:
-#    extends:
-#      file: ./kafka.yml
-#      service: kafka
-#  zookeeper:
-#    extends:
-#      file: ./kafka.yml
-#      service: zookeeper

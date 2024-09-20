@@ -34,6 +34,7 @@
     <logger name="jakarta.mail" level="WARN"/>
     <logger name="jakarta.management.remote" level="WARN"/>
     <logger name="jakarta.xml.bind" level="WARN"/>
+    <logger name="javax.management" level="WARN"/>
     <logger name="jdk.event.security" level="INFO"/>
     <logger name="com.ryantenney" level="WARN"/>
     <logger name="com.sun" level="WARN"/>

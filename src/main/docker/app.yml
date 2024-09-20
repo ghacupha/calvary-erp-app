@@ -2,7 +2,7 @@
 version: '3.3'
 services:
   calvary-gateway-api:
-    image: ghacupha/calvary-erp-api
+    image: ghacupha/calvary-erp-api:0.0.1-SNAPSHOT
     volumes:
       - ./logs/:/logs/
       - ./reports-directory/:/reports-directory/
@@ -10,12 +10,13 @@ services:
       - ./business-documents/:/business-documents/
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - MAVEN_OPTS=-Dspring.profiles.active
       - SPRING_PROFILES_ACTIVE=prod,api-docs
       - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
       - SPRING_CLOUD_CONSUL_HOST=consul
       - SPRING_CLOUD_CONSUL_PORT=8500
-      - SPRING_R2DBC_URL=${LOCAL_R2DBC_URL}/calvaryApiGateway
-      - SPRING_LIQUIBASE_URL=${LOCAL_PG_SERVER}/calvaryApiGateway
+      - SPRING_R2DBC_URL=${LOCAL_R2DBC_URL}/calvaryErpApi
+      - SPRING_LIQUIBASE_URL=${LOCAL_PG_SERVER}/calvaryErpApi
       - SPRING_ELASTICSEARCH_URIS=http://10.60.27.22:9301
       - SPRING_ELASTICSEARCH_REST_URIS=http://10.60.27.22:9301
       - SPRING_DATA_JEST_URI_PROD_CALVARY=http://10.60.27.22:9301

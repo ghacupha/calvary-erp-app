@@ -26,6 +26,7 @@
         <java.version>17</java.version>
         <node.version>v20.17.0</node.version>
         <npm.version>10.8.2</npm.version>
+        <docker.image.prefix>ghacupha</docker.image.prefix>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
@@ -33,6 +34,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <start-class>io.github.erp.CalvaryErpApiApp</start-class>
         <argLine>-Djava.security.egd=file:/dev/./urandom -Xmx1G</argLine>
+        <argLine>-Dspring.profiles.active</argLine>
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
         <run.addResources>false</run.addResources>
         <spring-boot.version>${project.parent.version}</spring-boot.version>
@@ -49,9 +51,9 @@
         <jib-maven-plugin.image>eclipse-temurin:17-jre-focal</jib-maven-plugin.image>
         <jib-maven-plugin.version>3.4.3</jib-maven-plugin.version>
         <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-        <liquibase-plugin.password/>
-        <liquibase-plugin.url/>
-        <liquibase-plugin.username/>
+        <liquibase-plugin.password>${env.PG_DATABASE_DEV_PASSWORD}</liquibase-plugin.password>
+        <liquibase-plugin.url>${env.LOCAL_PG_SERVER}/calvaryErpApiDev</liquibase-plugin.url>
+        <liquibase-plugin.username>${env.PG_DATABASE_DEV_USER}</liquibase-plugin.username>
         <mapstruct.version>1.6.0</mapstruct.version>
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
         <maven-checkstyle-plugin.version>3.5.0</maven-checkstyle-plugin.version>
@@ -648,7 +650,7 @@
                             </platforms>
                         </from>
                         <to>
-                            <image>calvaryerpapi:latest</image>
+                            <image>${docker.image.prefix}/${project.artifactId}:${project.version}</image>
                         </to>
                         <container>
                             <entrypoint>
@@ -794,10 +796,10 @@
                         <changeLogFile>config/liquibase/master.xml</changeLogFile>
                         <diffChangeLogFile>${project.basedir}/src/main/resources/config/liquibase/changelog/${maven.build.timestamp}_changelog.xml</diffChangeLogFile>
                         <driver>org.postgresql.Driver</driver>
-                        <url>${env.LOCAL_PG_SERVER}/calvaryErpApiDev</url>
+                        <url>${liquibase-plugin.url}</url>
                         <defaultSchemaName/>
-                        <username>${env.PG_DATABASE_DEV_USER}</username>
-                        <password>${env.PG_DATABASE_DEV_PASSWORD}</password>
+                        <username>${liquibase-plugin.username}</username>
+                        <password>${liquibase-plugin.password}</password>
                         <verbose>true</verbose>
                         <logging>debug</logging>
                         <contexts>!test</contexts>
@@ -848,9 +850,9 @@
             </activation>
             <properties>
                 <!-- default Spring profiles -->
-                <liquibase-plugin.url>${env.LOCAL_PG_SERVER}/calvaryErpApiDev</liquibase-plugin.url>
-                <liquibase-plugin.username>${env.PG_DATABASE_DEV_USER}</liquibase-plugin.username>
-                <liquibase-plugin.password>${env.PG_DATABASE_DEV_PASSWORD}</liquibase-plugin.password>
+                <liquibase-plugin.password/>
+                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/calvaryErpApi</liquibase-plugin.url>
+                <liquibase-plugin.username>calvaryErpApi</liquibase-plugin.username>
                 <profile.test>testdev</profile.test>
                 <spring.profiles.active>dev${profile.tls}${profile.no-liquibase}</spring.profiles.active>
             </properties>
@@ -952,10 +954,10 @@
             <id>prod</id>
             <properties>
                 <!-- default Spring profiles -->
-                <liquibase-plugin.url>${env.LOCAL_PG_SERVER}/calvaryErpApi</liquibase-plugin.url>
-                <liquibase-plugin.username>${env.PG_DATABASE_PROD_USER}</liquibase-plugin.username>
-                <liquibase-plugin.password>${env.PG_DATABASE_PROD_PASSWORD}</liquibase-plugin.password>
-              <profile.test>testprod</profile.test>
+                <liquibase-plugin.password/>
+                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/calvaryErpApi</liquibase-plugin.url>
+                <liquibase-plugin.username>calvaryErpApi</liquibase-plugin.username>
+                <profile.test>testprod</profile.test>
                 <spring.profiles.active>prod${profile.api-docs}${profile.tls}${profile.e2e}${profile.no-liquibase}</spring.profiles.active>
             </properties>
             <build>
@@ -1138,7 +1140,7 @@
                                         <include>package-lock.json</include>
                                         <include>package.json</include>
                                         <include>tsconfig.json</include>
-                                        <include>.postcss.config.js</include>
+                                        <include>tsconfig.app.json</include>
                                         <include>webpack/*.*</include>
                                     </includes>
                                     <excludes>

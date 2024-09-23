@@ -153,6 +153,10 @@ Desktop.ini
 /.nyc_output/
 
 ######################
-# ES Test Data
+# ES & Postgresql Test Data
 ######################
 /src/main/docker/search-index-directory
+src/main/docker/search-index-directory/
+src/main/docker/.env
+*.env
+.env

@@ -160,3 +160,5 @@ src/main/docker/search-index-directory/
 src/main/docker/.env
 *.env
 .env
+src/main/docker/pgadmindata/
+/src/main/docker/pgadmindata/

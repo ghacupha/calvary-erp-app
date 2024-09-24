@@ -155,8 +155,9 @@ Desktop.ini
 ######################
 # ES & Postgresql Test Data
 ######################
-/src/main/docker/search-index-directory
+*/search-index-directory/*
 src/main/docker/search-index-directory/
+src/main/docker/search-index-directory/indices
 src/main/docker/.env
 *.env
 .env

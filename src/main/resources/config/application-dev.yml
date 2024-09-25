@@ -62,7 +62,7 @@ spring:
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev #, faker
-    url: ${LOCAL_PG_SERVER}/calvaryErpApiDev
+    url: ${LOCAL_CALVARY_PG_SERVER}/calvaryErpApiDev
   mail:
     host: smtp.gmail.com
     port: 587
@@ -79,9 +79,9 @@ spring:
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   r2dbc:
-    url: ${LOCAL_R2DBC_URL}/calvaryErpApiDev
-    username: ${PG_DATABASE_DEV_USER}
-    password: ${PG_DATABASE_DEV_PASSWORD}
+    url: ${LOCAL_CALVARY_R2DBC_URL}/calvaryErpApiDev
+    username: ${CALVARY_PG_DATABASE_DEV_USER}
+    password: ${CALVARY_PG_DATABASE_DEV_PASSWORD}
   thymeleaf:
     cache: false
 

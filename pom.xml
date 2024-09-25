@@ -51,9 +51,9 @@
         <jib-maven-plugin.image>eclipse-temurin:17-jre-focal</jib-maven-plugin.image>
         <jib-maven-plugin.version>3.4.3</jib-maven-plugin.version>
         <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-        <liquibase-plugin.password>${env.PG_DATABASE_DEV_PASSWORD}</liquibase-plugin.password>
-        <liquibase-plugin.url>${env.LOCAL_PG_SERVER}/calvaryErpApiDev</liquibase-plugin.url>
-        <liquibase-plugin.username>${env.PG_DATABASE_DEV_USER}</liquibase-plugin.username>
+        <liquibase-plugin.password>${env.CALVARY_PG_DATABASE_DEV_PASSWORD}</liquibase-plugin.password>
+        <liquibase-plugin.url>${env.LOCAL_CALVARY_PG_SERVER}/calvaryErpApiDev</liquibase-plugin.url>
+        <liquibase-plugin.username>${env.CALVARY_PG_DATABASE_DEV_USER}</liquibase-plugin.username>
         <mapstruct.version>1.6.0</mapstruct.version>
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
         <maven-checkstyle-plugin.version>3.5.0</maven-checkstyle-plugin.version>

@@ -850,11 +850,11 @@
             </activation>
             <properties>
                 <!-- default Spring profiles -->
-                <liquibase-plugin.password/>
-                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/calvaryErpApi</liquibase-plugin.url>
-                <liquibase-plugin.username>calvaryErpApi</liquibase-plugin.username>
-                <profile.test>testdev</profile.test>
-                <spring.profiles.active>dev${profile.tls}${profile.no-liquibase}</spring.profiles.active>
+              <liquibase-plugin.password>${env.CALVARY_PG_DATABASE_DEV_PASSWORD}</liquibase-plugin.password>
+              <liquibase-plugin.url>${env.LOCAL_CALVARY_PG_SERVER}/calvaryErpApiDev</liquibase-plugin.url>
+              <liquibase-plugin.username>${env.CALVARY_PG_DATABASE_DEV_USER}</liquibase-plugin.username>
+              <profile.test>testdev</profile.test>
+              <spring.profiles.active>dev${profile.tls}${profile.no-liquibase}</spring.profiles.active>
             </properties>
             <dependencies>
                 <dependency>
@@ -954,9 +954,9 @@
             <id>prod</id>
             <properties>
                 <!-- default Spring profiles -->
-                <liquibase-plugin.password/>
-                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/calvaryErpApi</liquibase-plugin.url>
-                <liquibase-plugin.username>calvaryErpApi</liquibase-plugin.username>
+                <liquibase-plugin.password>${env.CALVARY_PG_DATABASE_DEV_PASSWORD}</liquibase-plugin.password>
+                <liquibase-plugin.url>${env.LOCAL_CALVARY_PG_SERVER}/calvaryErpApi</liquibase-plugin.url>
+                <liquibase-plugin.username>${env.CALVARY_PG_DATABASE_DEV_USER}</liquibase-plugin.username>
                 <profile.test>testprod</profile.test>
                 <spring.profiles.active>prod${profile.api-docs}${profile.tls}${profile.e2e}${profile.no-liquibase}</spring.profiles.active>
             </properties>

@@ -49,10 +49,10 @@ describe('ApplicationUser Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call User query and add missing value', () => {
       const applicationUser: IApplicationUser = { id: 456 };
-      const systemUser: IUser = { id: 9328 };
+      const systemUser: IUser = { id: 19791 };
       applicationUser.systemUser = systemUser;
 
-      const userCollection: IUser[] = [{ id: 30196 }];
+      const userCollection: IUser[] = [{ id: 22781 }];
       jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
       const additionalUsers = [systemUser];
       const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
@@ -71,7 +71,7 @@ describe('ApplicationUser Management Update Component', () => {
 
     it('Should update editForm', () => {
       const applicationUser: IApplicationUser = { id: 456 };
-      const systemUser: IUser = { id: 23589 };
+      const systemUser: IUser = { id: 16582 };
       applicationUser.systemUser = systemUser;
 
       activatedRoute.data = of({ applicationUser });

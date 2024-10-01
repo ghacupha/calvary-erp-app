@@ -1,0 +1,28 @@
+{
+  "annotations": {
+    "changelogDate": "20241001103432"
+  },
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Institution",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityField": "endDate",
+      "otherEntityName": "entitySubscription",
+      "otherEntityRelationshipName": "institution",
+      "relationshipName": "entitySubscription",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "serviceImpl"
+}

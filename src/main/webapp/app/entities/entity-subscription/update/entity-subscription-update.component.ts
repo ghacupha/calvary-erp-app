@@ -2,11 +2,13 @@ import { Component, OnInit, inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { IInstitution } from 'app/entities/institution/institution.model';
+import { InstitutionService } from 'app/entities/institution/service/institution.service';
 import { IEntitySubscription } from '../entity-subscription.model';
 import { EntitySubscriptionService } from '../service/entity-subscription.service';
 import { EntitySubscriptionFormGroup, EntitySubscriptionFormService } from './entity-subscription-form.service';
@@ -21,12 +23,17 @@ export class EntitySubscriptionUpdateComponent implements OnInit {
   isSaving = false;
   entitySubscription: IEntitySubscription | null = null;
 
+  institutionsSharedCollection: IInstitution[] = [];
+
   protected entitySubscriptionService = inject(EntitySubscriptionService);
   protected entitySubscriptionFormService = inject(EntitySubscriptionFormService);
+  protected institutionService = inject(InstitutionService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: EntitySubscriptionFormGroup = this.entitySubscriptionFormService.createEntitySubscriptionFormGroup();
+
+  compareInstitution = (o1: IInstitution | null, o2: IInstitution | null): boolean => this.institutionService.compareInstitution(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ entitySubscription }) => {
@@ -34,6 +41,8 @@ export class EntitySubscriptionUpdateComponent implements OnInit {
       if (entitySubscription) {
         this.updateForm(entitySubscription);
       }
+
+      this.loadRelationshipsOptions();
     });
   }
 
@@ -73,5 +82,22 @@ export class EntitySubscriptionUpdateComponent implements OnInit {
   protected updateForm(entitySubscription: IEntitySubscription): void {
     this.entitySubscription = entitySubscription;
     this.entitySubscriptionFormService.resetForm(this.editForm, entitySubscription);
+
+    this.institutionsSharedCollection = this.institutionService.addInstitutionToCollectionIfMissing<IInstitution>(
+      this.institutionsSharedCollection,
+      entitySubscription.institution,
+    );
+  }
+
+  protected loadRelationshipsOptions(): void {
+    this.institutionService
+      .query()
+      .pipe(map((res: HttpResponse<IInstitution[]>) => res.body ?? []))
+      .pipe(
+        map((institutions: IInstitution[]) =>
+          this.institutionService.addInstitutionToCollectionIfMissing<IInstitution>(institutions, this.entitySubscription?.institution),
+        ),
+      )
+      .subscribe((institutions: IInstitution[]) => (this.institutionsSharedCollection = institutions));
   }
 }

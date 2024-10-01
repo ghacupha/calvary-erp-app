@@ -35,6 +35,7 @@ type EntitySubscriptionFormGroupContent = {
   subscriptionToken: FormControl<EntitySubscriptionFormRawValue['subscriptionToken']>;
   startDate: FormControl<EntitySubscriptionFormRawValue['startDate']>;
   endDate: FormControl<EntitySubscriptionFormRawValue['endDate']>;
+  institution: FormControl<EntitySubscriptionFormRawValue['institution']>;
 };
 
 export type EntitySubscriptionFormGroup = FormGroup<EntitySubscriptionFormGroupContent>;
@@ -63,6 +64,7 @@ export class EntitySubscriptionFormService {
       endDate: new FormControl(entitySubscriptionRawValue.endDate, {
         validators: [Validators.required],
       }),
+      institution: new FormControl(entitySubscriptionRawValue.institution),
     });
   }
 

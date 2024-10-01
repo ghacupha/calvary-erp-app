@@ -3,36 +3,34 @@ import dayjs from 'dayjs/esm';
 import { IApplicationUser, NewApplicationUser } from './application-user.model';
 
 export const sampleWithRequiredData: IApplicationUser = {
-  id: 2592,
-  username: 'although',
+  id: 16892,
+  username: 'mister mid anenst',
 };
 
 export const sampleWithPartialData: IApplicationUser = {
-  id: 1808,
-  username: 'sermon forenenst',
-  firstName: 'Camron',
-  lastName: 'Legros',
-  email: 'Sheila39@hotmail.com',
-  imageUrl: 'tunnel',
-  activationKey: 'off',
+  id: 1504,
+  username: 'slim',
+  lastName: 'Jenkins',
+  activated: false,
+  resetDate: dayjs('2024-09-30T06:25'),
 };
 
 export const sampleWithFullData: IApplicationUser = {
-  id: 24786,
-  username: 'date',
-  firstName: 'Brenda',
-  lastName: 'Homenick',
-  email: 'Talia.Reinger@gmail.com',
+  id: 5454,
+  username: 'to beside fooey',
+  firstName: 'Mustafa',
+  lastName: 'Ferry',
+  email: 'Leonor.Bashirian53@yahoo.com',
   activated: true,
-  langKey: 'upright',
-  imageUrl: 'encourage unless so',
-  activationKey: 'mortal spherical without',
-  resetKey: 'rash whether',
-  resetDate: dayjs('2024-09-30T05:07'),
+  langKey: 'so recession',
+  imageUrl: 'after with',
+  activationKey: 'gloom',
+  resetKey: 'sneaky considering jubilantly',
+  resetDate: dayjs('2024-09-30T03:05'),
 };
 
 export const sampleWithNewData: NewApplicationUser = {
-  username: 'unwrap',
+  username: 'near rare cabin',
   id: null,
 };
 

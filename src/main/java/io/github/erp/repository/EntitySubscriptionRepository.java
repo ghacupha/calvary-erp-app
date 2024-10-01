@@ -3,6 +3,7 @@ package io.github.erp.repository;
 import io.github.erp.domain.EntitySubscription;
 import io.github.erp.domain.criteria.EntitySubscriptionCriteria;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -16,6 +17,12 @@ import reactor.core.publisher.Mono;
 public interface EntitySubscriptionRepository
     extends ReactiveCrudRepository<EntitySubscription, Long>, EntitySubscriptionRepositoryInternal {
     Flux<EntitySubscription> findAllBy(Pageable pageable);
+
+    @Query("SELECT * FROM entity_subscription entity WHERE entity.institution_id = :id")
+    Flux<EntitySubscription> findByInstitution(Long id);
+
+    @Query("SELECT * FROM entity_subscription entity WHERE entity.institution_id IS NULL")
+    Flux<EntitySubscription> findAllWhereInstitutionIsNull();
 
     @Override
     <S extends EntitySubscription> Mono<S> save(S entity);

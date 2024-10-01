@@ -12,8 +12,10 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.erp.IntegrationTest;
 import io.github.erp.domain.EntitySubscription;
+import io.github.erp.domain.Institution;
 import io.github.erp.repository.EntityManager;
 import io.github.erp.repository.EntitySubscriptionRepository;
+import io.github.erp.repository.InstitutionRepository;
 import io.github.erp.repository.search.EntitySubscriptionSearchRepository;
 import io.github.erp.service.dto.EntitySubscriptionDTO;
 import io.github.erp.service.mapper.EntitySubscriptionMapper;
@@ -84,6 +86,9 @@ class EntitySubscriptionResourceIT {
     private EntitySubscription entitySubscription;
 
     private EntitySubscription insertedEntitySubscription;
+
+    @Autowired
+    private InstitutionRepository institutionRepository;
 
     /**
      * Create an entity for this test.
@@ -507,6 +512,20 @@ class EntitySubscriptionResourceIT {
         defaultEntitySubscriptionFiltering("endDate.greaterThan=" + SMALLER_END_DATE, "endDate.greaterThan=" + DEFAULT_END_DATE);
     }
 
+    @Test
+    void getAllEntitySubscriptionsByInstitutionIsEqualToSomething() {
+        Institution institution = InstitutionResourceIT.createEntity();
+        institutionRepository.save(institution).block();
+        Long institutionId = institution.getId();
+        entitySubscription.setInstitutionId(institutionId);
+        insertedEntitySubscription = entitySubscriptionRepository.save(entitySubscription).block();
+        // Get all the entitySubscriptionList where institution equals to institutionId
+        defaultEntitySubscriptionShouldBeFound("institutionId.equals=" + institutionId);
+
+        // Get all the entitySubscriptionList where institution equals to (institutionId + 1)
+        defaultEntitySubscriptionShouldNotBeFound("institutionId.equals=" + (institutionId + 1));
+    }
+
     private void defaultEntitySubscriptionFiltering(String shouldBeFound, String shouldNotBeFound) {
         defaultEntitySubscriptionShouldBeFound(shouldBeFound);
         defaultEntitySubscriptionShouldNotBeFound(shouldNotBeFound);
@@ -725,7 +744,7 @@ class EntitySubscriptionResourceIT {
         EntitySubscription partialUpdatedEntitySubscription = new EntitySubscription();
         partialUpdatedEntitySubscription.setId(entitySubscription.getId());
 
-        partialUpdatedEntitySubscription.subscriptionToken(UPDATED_SUBSCRIPTION_TOKEN).endDate(UPDATED_END_DATE);
+        partialUpdatedEntitySubscription.startDate(UPDATED_START_DATE);
 
         webTestClient
             .patch()

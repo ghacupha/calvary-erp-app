@@ -67,6 +67,8 @@ public class EntitySubscriptionAsserts {
      * @param actual the actual entity
      */
     public static void assertEntitySubscriptionUpdatableRelationshipsEquals(EntitySubscription expected, EntitySubscription actual) {
-        // empty method
+        assertThat(expected)
+            .as("Verify EntitySubscription relationships")
+            .satisfies(e -> assertThat(e.getInstitution()).as("check institution").isEqualTo(actual.getInstitution()));
     }
 }

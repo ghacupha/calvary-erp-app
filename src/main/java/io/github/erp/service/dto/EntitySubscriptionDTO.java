@@ -23,6 +23,8 @@ public class EntitySubscriptionDTO implements Serializable {
     @NotNull(message = "must not be null")
     private ZonedDateTime endDate;
 
+    private InstitutionDTO institution;
+
     public Long getId() {
         return id;
     }
@@ -55,6 +57,14 @@ public class EntitySubscriptionDTO implements Serializable {
         this.endDate = endDate;
     }
 
+    public InstitutionDTO getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(InstitutionDTO institution) {
+        this.institution = institution;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -84,6 +94,7 @@ public class EntitySubscriptionDTO implements Serializable {
             ", subscriptionToken='" + getSubscriptionToken() + "'" +
             ", startDate='" + getStartDate() + "'" +
             ", endDate='" + getEndDate() + "'" +
+            ", institution=" + getInstitution() +
             "}";
     }
 }

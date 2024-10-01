@@ -30,6 +30,8 @@ public class EntitySubscriptionCriteria implements Serializable, Criteria {
 
     private ZonedDateTimeFilter endDate;
 
+    private LongFilter institutionId;
+
     private Boolean distinct;
 
     public EntitySubscriptionCriteria() {}
@@ -39,6 +41,7 @@ public class EntitySubscriptionCriteria implements Serializable, Criteria {
         this.subscriptionToken = other.optionalSubscriptionToken().map(UUIDFilter::copy).orElse(null);
         this.startDate = other.optionalStartDate().map(ZonedDateTimeFilter::copy).orElse(null);
         this.endDate = other.optionalEndDate().map(ZonedDateTimeFilter::copy).orElse(null);
+        this.institutionId = other.optionalInstitutionId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -123,6 +126,25 @@ public class EntitySubscriptionCriteria implements Serializable, Criteria {
         this.endDate = endDate;
     }
 
+    public LongFilter getInstitutionId() {
+        return institutionId;
+    }
+
+    public Optional<LongFilter> optionalInstitutionId() {
+        return Optional.ofNullable(institutionId);
+    }
+
+    public LongFilter institutionId() {
+        if (institutionId == null) {
+            setInstitutionId(new LongFilter());
+        }
+        return institutionId;
+    }
+
+    public void setInstitutionId(LongFilter institutionId) {
+        this.institutionId = institutionId;
+    }
+
     public Boolean getDistinct() {
         return distinct;
     }
@@ -156,13 +178,14 @@ public class EntitySubscriptionCriteria implements Serializable, Criteria {
             Objects.equals(subscriptionToken, that.subscriptionToken) &&
             Objects.equals(startDate, that.startDate) &&
             Objects.equals(endDate, that.endDate) &&
+            Objects.equals(institutionId, that.institutionId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, subscriptionToken, startDate, endDate, distinct);
+        return Objects.hash(id, subscriptionToken, startDate, endDate, institutionId, distinct);
     }
 
     // prettier-ignore
@@ -173,6 +196,7 @@ public class EntitySubscriptionCriteria implements Serializable, Criteria {
             optionalSubscriptionToken().map(f -> "subscriptionToken=" + f + ", ").orElse("") +
             optionalStartDate().map(f -> "startDate=" + f + ", ").orElse("") +
             optionalEndDate().map(f -> "endDate=" + f + ", ").orElse("") +
+            optionalInstitutionId().map(f -> "institutionId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";
     }

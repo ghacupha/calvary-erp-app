@@ -15,6 +15,7 @@ public class EntitySubscriptionSqlHelper {
         columns.add(Column.aliased("start_date", table, columnPrefix + "_start_date"));
         columns.add(Column.aliased("end_date", table, columnPrefix + "_end_date"));
 
+        columns.add(Column.aliased("institution_id", table, columnPrefix + "_institution_id"));
         return columns;
     }
 }

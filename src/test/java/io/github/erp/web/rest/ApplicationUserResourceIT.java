@@ -1072,10 +1072,11 @@ class ApplicationUserResourceIT {
             .username(UPDATED_USERNAME)
             .lastName(UPDATED_LAST_NAME)
             .email(UPDATED_EMAIL)
-            .activated(UPDATED_ACTIVATED)
+            .langKey(UPDATED_LANG_KEY)
             .imageUrl(UPDATED_IMAGE_URL)
             .activationKey(UPDATED_ACTIVATION_KEY)
-            .resetKey(UPDATED_RESET_KEY);
+            .resetKey(UPDATED_RESET_KEY)
+            .resetDate(UPDATED_RESET_DATE);
 
         webTestClient
             .patch()

@@ -1,10 +1,12 @@
 package io.github.erp.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -33,6 +35,13 @@ public class EntitySubscription implements Serializable {
     @NotNull(message = "must not be null")
     @Column("end_date")
     private ZonedDateTime endDate;
+
+    @Transient
+    @JsonIgnoreProperties(value = { "entitySubscriptions" }, allowSetters = true)
+    private Institution institution;
+
+    @Column("institution_id")
+    private Long institutionId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -86,6 +95,28 @@ public class EntitySubscription implements Serializable {
 
     public void setEndDate(ZonedDateTime endDate) {
         this.endDate = endDate;
+    }
+
+    public Institution getInstitution() {
+        return this.institution;
+    }
+
+    public void setInstitution(Institution institution) {
+        this.institution = institution;
+        this.institutionId = institution != null ? institution.getId() : null;
+    }
+
+    public EntitySubscription institution(Institution institution) {
+        this.setInstitution(institution);
+        return this;
+    }
+
+    public Long getInstitutionId() {
+        return this.institutionId;
+    }
+
+    public void setInstitutionId(Long institution) {
+        this.institutionId = institution;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

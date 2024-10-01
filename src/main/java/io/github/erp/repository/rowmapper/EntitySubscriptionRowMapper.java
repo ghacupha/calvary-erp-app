@@ -30,6 +30,7 @@ public class EntitySubscriptionRowMapper implements BiFunction<Row, String, Enti
         entity.setSubscriptionToken(converter.fromRow(row, prefix + "_subscription_token", UUID.class));
         entity.setStartDate(converter.fromRow(row, prefix + "_start_date", ZonedDateTime.class));
         entity.setEndDate(converter.fromRow(row, prefix + "_end_date", ZonedDateTime.class));
+        entity.setInstitutionId(converter.fromRow(row, prefix + "_institution_id", Long.class));
         return entity;
     }
 }

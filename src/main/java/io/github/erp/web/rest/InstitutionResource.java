@@ -195,6 +195,36 @@ public class InstitutionResource {
     }
 
     /**
+     * {@code GET  /institutions} : get all the institutions.
+     *
+     * @param pageable the pagination information.
+     * @param request a {@link ServerHttpRequest} request.
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of institutions in body.
+     */
+    @GetMapping(value = "registered", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<List<InstitutionDTO>>> getRegisteredInstitutions(
+        InstitutionCriteria criteria,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+        ServerHttpRequest request
+    ) {
+        LOG.debug("REST request to get Institutions by criteria: {}", criteria);
+        return institutionService
+            .countByCriteria(criteria)
+            .zipWith(institutionService.findByCriteria(criteria, pageable).collectList())
+            .map(countWithEntities ->
+                ResponseEntity.ok()
+                    .headers(
+                        PaginationUtil.generatePaginationHttpHeaders(
+                            ForwardedHeaderUtils.adaptFromForwardedHeaders(request.getURI(), request.getHeaders()),
+                            new PageImpl<>(countWithEntities.getT2(), pageable, countWithEntities.getT1())
+                        )
+                    )
+                    .body(countWithEntities.getT2())
+            );
+    }
+
+    /**
      * {@code GET  /institutions/count} : count all the institutions.
      *
      * @param criteria the criteria which the requested entities should match.

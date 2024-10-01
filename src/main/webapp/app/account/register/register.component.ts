@@ -64,7 +64,7 @@ export default class RegisterComponent implements AfterViewInit, OnInit {
   }
 
   loadInstitutions(): void {
-    this.institutionService.query().subscribe(res => {
+    this.institutionService.queryRegistered().subscribe(res => {
       this.institutions = res.body ? res.body : [];
     });
   }

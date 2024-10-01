@@ -32,6 +32,12 @@ public interface ApplicationUserRepository extends ReactiveCrudRepository<Applic
     @Query("SELECT * FROM application_user entity WHERE entity.system_user_id IS NULL")
     Flux<ApplicationUser> findAllWhereSystemUserIsNull();
 
+    @Query("SELECT * FROM application_user entity WHERE entity.institution_id = :id")
+    Flux<ApplicationUser> findByInstitution(Long id);
+
+    @Query("SELECT * FROM application_user entity WHERE entity.institution_id IS NULL")
+    Flux<ApplicationUser> findAllWhereInstitutionIsNull();
+
     @Override
     <S extends ApplicationUser> Mono<S> save(S entity);
 

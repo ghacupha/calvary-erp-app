@@ -1,5 +1,6 @@
 import dayjs from 'dayjs/esm';
 import { IUser } from 'app/entities/user/user.model';
+import { IInstitution } from 'app/entities/institution/institution.model';
 
 export interface IApplicationUser {
   id: number;
@@ -14,6 +15,7 @@ export interface IApplicationUser {
   resetKey?: string | null;
   resetDate?: dayjs.Dayjs | null;
   systemUser?: Pick<IUser, 'id' | 'login'> | null;
+  institution?: Pick<IInstitution, 'id' | 'name'> | null;
 }
 
 export type NewApplicationUser = Omit<IApplicationUser, 'id'> & { id: null };

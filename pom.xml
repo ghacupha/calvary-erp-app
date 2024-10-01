@@ -796,10 +796,13 @@
                         <changeLogFile>config/liquibase/master.xml</changeLogFile>
                         <diffChangeLogFile>${project.basedir}/src/main/resources/config/liquibase/changelog/${maven.build.timestamp}_changelog.xml</diffChangeLogFile>
                         <driver>org.postgresql.Driver</driver>
-                        <url>${liquibase-plugin.url}</url>
+                        <url>${env.LOCAL_CALVARY_PG_SERVER}/calvaryErpApiDev</url>
                         <defaultSchemaName/>
-                        <username>${liquibase-plugin.username}</username>
-                        <password>${liquibase-plugin.password}</password>
+                        <username>${env.CALVARY_PG_DATABASE_DEV_USER}</username>
+                        <password>${env.CALVARY_PG_DATABASE_DEV_PASSWORD}</password>
+                        <referenceUrl>${env.LOCAL_CALVARY_PG_SERVER}/calvaryErpApiDev</referenceUrl>
+                        <referenceUsername>${env.CALVARY_PG_DATABASE_DEV_USER}</referenceUsername>
+                        <referencePassword>${env.CALVARY_PG_DATABASE_DEV_PASSWORD}</referencePassword>
                         <verbose>true</verbose>
                         <logging>debug</logging>
                         <contexts>!test</contexts>
@@ -1108,7 +1111,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
+                    <!--<plugin>
                         <groupId>net.nicoulaj.maven.plugins</groupId>
                         <artifactId>checksum-maven-plugin</artifactId>
                         <executions>
@@ -1158,7 +1161,7 @@
                             <includeRelativePath>true</includeRelativePath>
                             <quiet>true</quiet>
                         </configuration>
-                    </plugin>
+                    </plugin>-->
                 </plugins>
             </build>
         </profile>

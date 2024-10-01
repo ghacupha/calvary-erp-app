@@ -59,6 +59,16 @@
           <dd>
             <span>{{ applicationUserRef.systemUser?.login }}</span>
           </dd>
+          <dt><span>Institution</span></dt>
+          <dd>
+            @if (applicationUser()!.institution) {
+              <div>
+                <a [routerLink]="['/institution', applicationUser()!.institution?.id, 'view']">{{
+                  applicationUserRef.institution?.name
+                }}</a>
+              </div>
+            }
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

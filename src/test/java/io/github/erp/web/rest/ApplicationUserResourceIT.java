@@ -11,9 +11,11 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.erp.IntegrationTest;
 import io.github.erp.domain.ApplicationUser;
+import io.github.erp.domain.Institution;
 import io.github.erp.domain.User;
 import io.github.erp.repository.ApplicationUserRepository;
 import io.github.erp.repository.EntityManager;
+import io.github.erp.repository.InstitutionRepository;
 import io.github.erp.repository.UserRepository;
 import io.github.erp.repository.UserRepository;
 import io.github.erp.repository.search.ApplicationUserSearchRepository;
@@ -118,6 +120,9 @@ class ApplicationUserResourceIT {
 
     private ApplicationUser insertedApplicationUser;
 
+    @Autowired
+    private InstitutionRepository institutionRepository;
+
     /**
      * Create an entity for this test.
      *
@@ -139,6 +144,10 @@ class ApplicationUserResourceIT {
         // Add required entity
         User user = em.insert(UserResourceIT.createEntity()).block();
         applicationUser.setSystemUser(user);
+        // Add required entity
+        Institution institution;
+        institution = em.insert(InstitutionResourceIT.createEntity()).block();
+        applicationUser.setInstitution(institution);
         return applicationUser;
     }
 
@@ -163,6 +172,10 @@ class ApplicationUserResourceIT {
         // Add required entity
         User user = em.insert(UserResourceIT.createEntity()).block();
         updatedApplicationUser.setSystemUser(user);
+        // Add required entity
+        Institution institution;
+        institution = em.insert(InstitutionResourceIT.createUpdatedEntity()).block();
+        updatedApplicationUser.setInstitution(institution);
         return updatedApplicationUser;
     }
 
@@ -173,6 +186,7 @@ class ApplicationUserResourceIT {
             // It can fail, if other entities are still referring this - it will be removed later.
         }
         UserResourceIT.deleteEntities(em);
+        InstitutionResourceIT.deleteEntities(em);
     }
 
     @BeforeEach
@@ -824,6 +838,20 @@ class ApplicationUserResourceIT {
 
         // Get all the applicationUserList where systemUser equals to (systemUserId + 1)
         defaultApplicationUserShouldNotBeFound("systemUserId.equals=" + (systemUser.getId() + 1));
+    }
+
+    @Test
+    void getAllApplicationUsersByInstitutionIsEqualToSomething() {
+        Institution institution = InstitutionResourceIT.createEntity();
+        institutionRepository.save(institution).block();
+        Long institutionId = institution.getId();
+        applicationUser.setInstitutionId(institutionId);
+        insertedApplicationUser = applicationUserRepository.save(applicationUser).block();
+        // Get all the applicationUserList where institution equals to institutionId
+        defaultApplicationUserShouldBeFound("institutionId.equals=" + institutionId);
+
+        // Get all the applicationUserList where institution equals to (institutionId + 1)
+        defaultApplicationUserShouldNotBeFound("institutionId.equals=" + (institutionId + 1));
     }
 
     private void defaultApplicationUserFiltering(String shouldBeFound, String shouldNotBeFound) {

@@ -1,5 +1,6 @@
 package io.github.erp.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
@@ -65,8 +66,15 @@ public class ApplicationUser implements Serializable {
     @Transient
     private User systemUser;
 
+    @Transient
+    @JsonIgnoreProperties(value = { "entitySubscriptions" }, allowSetters = true)
+    private Institution institution;
+
     @Column("system_user_id")
     private Long systemUserId;
+
+    @Column("institution_id")
+    private Long institutionId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -227,12 +235,34 @@ public class ApplicationUser implements Serializable {
         return this;
     }
 
+    public Institution getInstitution() {
+        return this.institution;
+    }
+
+    public void setInstitution(Institution institution) {
+        this.institution = institution;
+        this.institutionId = institution != null ? institution.getId() : null;
+    }
+
+    public ApplicationUser institution(Institution institution) {
+        this.setInstitution(institution);
+        return this;
+    }
+
     public Long getSystemUserId() {
         return this.systemUserId;
     }
 
     public void setSystemUserId(Long user) {
         this.systemUserId = user;
+    }
+
+    public Long getInstitutionId() {
+        return this.institutionId;
+    }
+
+    public void setInstitutionId(Long institution) {
+        this.institutionId = institution;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

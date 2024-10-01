@@ -31,6 +31,7 @@ describe('ApplicationUser Form Service', () => {
             resetKey: expect.any(Object),
             resetDate: expect.any(Object),
             systemUser: expect.any(Object),
+            institution: expect.any(Object),
           }),
         );
       });
@@ -52,6 +53,7 @@ describe('ApplicationUser Form Service', () => {
             resetKey: expect.any(Object),
             resetDate: expect.any(Object),
             systemUser: expect.any(Object),
+            institution: expect.any(Object),
           }),
         );
       });

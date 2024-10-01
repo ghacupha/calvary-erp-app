@@ -1,22 +1,22 @@
 import { IInstitution, NewInstitution } from './institution.model';
 
 export const sampleWithRequiredData: IInstitution = {
-  id: 6132,
-  name: 'before amidst',
+  id: 8730,
+  name: 'boohoo painfully income',
 };
 
 export const sampleWithPartialData: IInstitution = {
-  id: 22391,
-  name: 'hence',
+  id: 18247,
+  name: 'bravely ew',
 };
 
 export const sampleWithFullData: IInstitution = {
-  id: 14895,
-  name: 'carefully ew',
+  id: 16826,
+  name: 'viciously',
 };
 
 export const sampleWithNewData: NewInstitution = {
-  name: 'clinch',
+  name: 'off',
   id: null,
 };
 

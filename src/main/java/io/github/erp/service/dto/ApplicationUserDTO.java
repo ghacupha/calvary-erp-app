@@ -37,6 +37,9 @@ public class ApplicationUserDTO implements Serializable {
     @NotNull
     private UserDTO systemUser;
 
+    @NotNull
+    private InstitutionDTO institution;
+
     public Long getId() {
         return id;
     }
@@ -133,6 +136,14 @@ public class ApplicationUserDTO implements Serializable {
         this.systemUser = systemUser;
     }
 
+    public InstitutionDTO getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(InstitutionDTO institution) {
+        this.institution = institution;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -170,6 +181,7 @@ public class ApplicationUserDTO implements Serializable {
             ", resetKey='" + getResetKey() + "'" +
             ", resetDate='" + getResetDate() + "'" +
             ", systemUser=" + getSystemUser() +
+            ", institution=" + getInstitution() +
             "}";
     }
 }

@@ -49,10 +49,10 @@ describe('EntitySubscription Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call Institution query and add missing value', () => {
       const entitySubscription: IEntitySubscription = { id: 456 };
-      const institution: IInstitution = { id: 24610 };
+      const institution: IInstitution = { id: 6132 };
       entitySubscription.institution = institution;
 
-      const institutionCollection: IInstitution[] = [{ id: 6251 }];
+      const institutionCollection: IInstitution[] = [{ id: 18862 }];
       jest.spyOn(institutionService, 'query').mockReturnValue(of(new HttpResponse({ body: institutionCollection })));
       const additionalInstitutions = [institution];
       const expectedCollection: IInstitution[] = [...additionalInstitutions, ...institutionCollection];
@@ -71,7 +71,7 @@ describe('EntitySubscription Management Update Component', () => {
 
     it('Should update editForm', () => {
       const entitySubscription: IEntitySubscription = { id: 456 };
-      const institution: IInstitution = { id: 1070 };
+      const institution: IInstitution = { id: 23411 };
       entitySubscription.institution = institution;
 
       activatedRoute.data = of({ entitySubscription });

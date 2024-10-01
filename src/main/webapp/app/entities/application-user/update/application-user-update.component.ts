@@ -9,8 +9,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/service/user.service';
-import { IApplicationUser } from '../application-user.model';
+import { IInstitution } from 'app/entities/institution/institution.model';
+import { InstitutionService } from 'app/entities/institution/service/institution.service';
 import { ApplicationUserService } from '../service/application-user.service';
+import { IApplicationUser } from '../application-user.model';
 import { ApplicationUserFormGroup, ApplicationUserFormService } from './application-user-form.service';
 
 @Component({
@@ -24,16 +26,20 @@ export class ApplicationUserUpdateComponent implements OnInit {
   applicationUser: IApplicationUser | null = null;
 
   usersSharedCollection: IUser[] = [];
+  institutionsSharedCollection: IInstitution[] = [];
 
   protected applicationUserService = inject(ApplicationUserService);
   protected applicationUserFormService = inject(ApplicationUserFormService);
   protected userService = inject(UserService);
+  protected institutionService = inject(InstitutionService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: ApplicationUserFormGroup = this.applicationUserFormService.createApplicationUserFormGroup();
 
   compareUser = (o1: IUser | null, o2: IUser | null): boolean => this.userService.compareUser(o1, o2);
+
+  compareInstitution = (o1: IInstitution | null, o2: IInstitution | null): boolean => this.institutionService.compareInstitution(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ applicationUser }) => {
@@ -87,6 +93,10 @@ export class ApplicationUserUpdateComponent implements OnInit {
       this.usersSharedCollection,
       applicationUser.systemUser,
     );
+    this.institutionsSharedCollection = this.institutionService.addInstitutionToCollectionIfMissing<IInstitution>(
+      this.institutionsSharedCollection,
+      applicationUser.institution,
+    );
   }
 
   protected loadRelationshipsOptions(): void {
@@ -95,5 +105,15 @@ export class ApplicationUserUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
       .pipe(map((users: IUser[]) => this.userService.addUserToCollectionIfMissing<IUser>(users, this.applicationUser?.systemUser)))
       .subscribe((users: IUser[]) => (this.usersSharedCollection = users));
+
+    this.institutionService
+      .query()
+      .pipe(map((res: HttpResponse<IInstitution[]>) => res.body ?? []))
+      .pipe(
+        map((institutions: IInstitution[]) =>
+          this.institutionService.addInstitutionToCollectionIfMissing<IInstitution>(institutions, this.applicationUser?.institution),
+        ),
+      )
+      .subscribe((institutions: IInstitution[]) => (this.institutionsSharedCollection = institutions));
   }
 }

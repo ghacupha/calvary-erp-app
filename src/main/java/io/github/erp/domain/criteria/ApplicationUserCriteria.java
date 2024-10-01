@@ -46,6 +46,8 @@ public class ApplicationUserCriteria implements Serializable, Criteria {
 
     private LongFilter systemUserId;
 
+    private LongFilter institutionId;
+
     private Boolean distinct;
 
     public ApplicationUserCriteria() {}
@@ -63,6 +65,7 @@ public class ApplicationUserCriteria implements Serializable, Criteria {
         this.resetKey = other.optionalResetKey().map(StringFilter::copy).orElse(null);
         this.resetDate = other.optionalResetDate().map(InstantFilter::copy).orElse(null);
         this.systemUserId = other.optionalSystemUserId().map(LongFilter::copy).orElse(null);
+        this.institutionId = other.optionalInstitutionId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -299,6 +302,25 @@ public class ApplicationUserCriteria implements Serializable, Criteria {
         this.systemUserId = systemUserId;
     }
 
+    public LongFilter getInstitutionId() {
+        return institutionId;
+    }
+
+    public Optional<LongFilter> optionalInstitutionId() {
+        return Optional.ofNullable(institutionId);
+    }
+
+    public LongFilter institutionId() {
+        if (institutionId == null) {
+            setInstitutionId(new LongFilter());
+        }
+        return institutionId;
+    }
+
+    public void setInstitutionId(LongFilter institutionId) {
+        this.institutionId = institutionId;
+    }
+
     public Boolean getDistinct() {
         return distinct;
     }
@@ -340,6 +362,7 @@ public class ApplicationUserCriteria implements Serializable, Criteria {
             Objects.equals(resetKey, that.resetKey) &&
             Objects.equals(resetDate, that.resetDate) &&
             Objects.equals(systemUserId, that.systemUserId) &&
+            Objects.equals(institutionId, that.institutionId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -359,6 +382,7 @@ public class ApplicationUserCriteria implements Serializable, Criteria {
             resetKey,
             resetDate,
             systemUserId,
+            institutionId,
             distinct
         );
     }
@@ -379,6 +403,7 @@ public class ApplicationUserCriteria implements Serializable, Criteria {
             optionalResetKey().map(f -> "resetKey=" + f + ", ").orElse("") +
             optionalResetDate().map(f -> "resetDate=" + f + ", ").orElse("") +
             optionalSystemUserId().map(f -> "systemUserId=" + f + ", ").orElse("") +
+            optionalInstitutionId().map(f -> "institutionId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";
     }

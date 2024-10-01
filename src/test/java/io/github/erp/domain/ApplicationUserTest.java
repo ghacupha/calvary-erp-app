@@ -1,6 +1,7 @@
 package io.github.erp.domain;
 
 import static io.github.erp.domain.ApplicationUserTestSamples.*;
+import static io.github.erp.domain.InstitutionTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.erp.web.rest.TestUtil;
@@ -20,5 +21,17 @@ class ApplicationUserTest {
 
         applicationUser2 = getApplicationUserSample2();
         assertThat(applicationUser1).isNotEqualTo(applicationUser2);
+    }
+
+    @Test
+    void institutionTest() {
+        ApplicationUser applicationUser = getApplicationUserRandomSampleGenerator();
+        Institution institutionBack = getInstitutionRandomSampleGenerator();
+
+        applicationUser.setInstitution(institutionBack);
+        assertThat(applicationUser.getInstitution()).isEqualTo(institutionBack);
+
+        applicationUser.institution(null);
+        assertThat(applicationUser.getInstitution()).isNull();
     }
 }

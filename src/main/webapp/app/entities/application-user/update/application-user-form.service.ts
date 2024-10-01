@@ -42,6 +42,7 @@ type ApplicationUserFormGroupContent = {
   resetKey: FormControl<ApplicationUserFormRawValue['resetKey']>;
   resetDate: FormControl<ApplicationUserFormRawValue['resetDate']>;
   systemUser: FormControl<ApplicationUserFormRawValue['systemUser']>;
+  institution: FormControl<ApplicationUserFormRawValue['institution']>;
 };
 
 export type ApplicationUserFormGroup = FormGroup<ApplicationUserFormGroupContent>;
@@ -74,6 +75,9 @@ export class ApplicationUserFormService {
       resetKey: new FormControl(applicationUserRawValue.resetKey),
       resetDate: new FormControl(applicationUserRawValue.resetDate),
       systemUser: new FormControl(applicationUserRawValue.systemUser, {
+        validators: [Validators.required],
+      }),
+      institution: new FormControl(applicationUserRawValue.institution, {
         validators: [Validators.required],
       }),
     });

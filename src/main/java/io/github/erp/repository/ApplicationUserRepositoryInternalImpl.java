@@ -4,6 +4,7 @@ import io.github.erp.domain.ApplicationUser;
 import io.github.erp.domain.criteria.ApplicationUserCriteria;
 import io.github.erp.repository.rowmapper.ApplicationUserRowMapper;
 import io.github.erp.repository.rowmapper.ColumnConverter;
+import io.github.erp.repository.rowmapper.InstitutionRowMapper;
 import io.github.erp.repository.rowmapper.UserRowMapper;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
@@ -42,16 +43,19 @@ class ApplicationUserRepositoryInternalImpl
     private final EntityManager entityManager;
 
     private final UserRowMapper userMapper;
+    private final InstitutionRowMapper institutionMapper;
     private final ApplicationUserRowMapper applicationuserMapper;
     private final ColumnConverter columnConverter;
 
     private static final Table entityTable = Table.aliased("application_user", EntityManager.ENTITY_ALIAS);
     private static final Table systemUserTable = Table.aliased("jhi_user", "systemUser");
+    private static final Table institutionTable = Table.aliased("institution", "institution");
 
     public ApplicationUserRepositoryInternalImpl(
         R2dbcEntityTemplate template,
         EntityManager entityManager,
         UserRowMapper userMapper,
+        InstitutionRowMapper institutionMapper,
         ApplicationUserRowMapper applicationuserMapper,
         R2dbcEntityOperations entityOperations,
         R2dbcConverter converter,
@@ -66,6 +70,7 @@ class ApplicationUserRepositoryInternalImpl
         this.r2dbcEntityTemplate = template;
         this.entityManager = entityManager;
         this.userMapper = userMapper;
+        this.institutionMapper = institutionMapper;
         this.applicationuserMapper = applicationuserMapper;
         this.columnConverter = columnConverter;
     }
@@ -78,12 +83,16 @@ class ApplicationUserRepositoryInternalImpl
     RowsFetchSpec<ApplicationUser> createQuery(Pageable pageable, Condition whereClause) {
         List<Expression> columns = ApplicationUserSqlHelper.getColumns(entityTable, EntityManager.ENTITY_ALIAS);
         columns.addAll(UserSqlHelper.getColumns(systemUserTable, "systemUser"));
+        columns.addAll(InstitutionSqlHelper.getColumns(institutionTable, "institution"));
         SelectFromAndJoinCondition selectFrom = Select.builder()
             .select(columns)
             .from(entityTable)
             .leftOuterJoin(systemUserTable)
             .on(Column.create("system_user_id", entityTable))
-            .equals(Column.create("id", systemUserTable));
+            .equals(Column.create("id", systemUserTable))
+            .leftOuterJoin(institutionTable)
+            .on(Column.create("institution_id", entityTable))
+            .equals(Column.create("id", institutionTable));
         // we do not support Criteria here for now as of https://github.com/jhipster/generator-jhipster/issues/18269
         String select = entityManager.createSelect(selectFrom, ApplicationUser.class, pageable, whereClause);
         return db.sql(select).map(this::process);
@@ -118,6 +127,7 @@ class ApplicationUserRepositoryInternalImpl
     private ApplicationUser process(Row row, RowMetadata metadata) {
         ApplicationUser entity = applicationuserMapper.apply(row, "e");
         entity.setSystemUser(userMapper.apply(row, "systemUser"));
+        entity.setInstitution(institutionMapper.apply(row, "institution"));
         return entity;
     }
 
@@ -177,6 +187,9 @@ class ApplicationUserRepositoryInternalImpl
             }
             if (criteria.getSystemUserId() != null) {
                 builder.buildFilterConditionForField(criteria.getSystemUserId(), systemUserTable.column("id"));
+            }
+            if (criteria.getInstitutionId() != null) {
+                builder.buildFilterConditionForField(criteria.getInstitutionId(), institutionTable.column("id"));
             }
         }
         return builder.buildConditions();

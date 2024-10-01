@@ -23,6 +23,7 @@ public class ApplicationUserSqlHelper {
         columns.add(Column.aliased("reset_date", table, columnPrefix + "_reset_date"));
 
         columns.add(Column.aliased("system_user_id", table, columnPrefix + "_system_user_id"));
+        columns.add(Column.aliased("institution_id", table, columnPrefix + "_institution_id"));
         return columns;
     }
 }

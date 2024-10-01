@@ -6,8 +6,10 @@ import { Subject, from, of } from 'rxjs';
 
 import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/service/user.service';
-import { ApplicationUserService } from '../service/application-user.service';
+import { IInstitution } from 'app/entities/institution/institution.model';
+import { InstitutionService } from 'app/entities/institution/service/institution.service';
 import { IApplicationUser } from '../application-user.model';
+import { ApplicationUserService } from '../service/application-user.service';
 import { ApplicationUserFormService } from './application-user-form.service';
 
 import { ApplicationUserUpdateComponent } from './application-user-update.component';
@@ -19,6 +21,7 @@ describe('ApplicationUser Management Update Component', () => {
   let applicationUserFormService: ApplicationUserFormService;
   let applicationUserService: ApplicationUserService;
   let userService: UserService;
+  let institutionService: InstitutionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,6 +45,7 @@ describe('ApplicationUser Management Update Component', () => {
     applicationUserFormService = TestBed.inject(ApplicationUserFormService);
     applicationUserService = TestBed.inject(ApplicationUserService);
     userService = TestBed.inject(UserService);
+    institutionService = TestBed.inject(InstitutionService);
 
     comp = fixture.componentInstance;
   });
@@ -69,15 +73,40 @@ describe('ApplicationUser Management Update Component', () => {
       expect(comp.usersSharedCollection).toEqual(expectedCollection);
     });
 
+    it('Should call Institution query and add missing value', () => {
+      const applicationUser: IApplicationUser = { id: 456 };
+      const institution: IInstitution = { id: 24610 };
+      applicationUser.institution = institution;
+
+      const institutionCollection: IInstitution[] = [{ id: 6251 }];
+      jest.spyOn(institutionService, 'query').mockReturnValue(of(new HttpResponse({ body: institutionCollection })));
+      const additionalInstitutions = [institution];
+      const expectedCollection: IInstitution[] = [...additionalInstitutions, ...institutionCollection];
+      jest.spyOn(institutionService, 'addInstitutionToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+      activatedRoute.data = of({ applicationUser });
+      comp.ngOnInit();
+
+      expect(institutionService.query).toHaveBeenCalled();
+      expect(institutionService.addInstitutionToCollectionIfMissing).toHaveBeenCalledWith(
+        institutionCollection,
+        ...additionalInstitutions.map(expect.objectContaining),
+      );
+      expect(comp.institutionsSharedCollection).toEqual(expectedCollection);
+    });
+
     it('Should update editForm', () => {
       const applicationUser: IApplicationUser = { id: 456 };
       const systemUser: IUser = { id: 16582 };
       applicationUser.systemUser = systemUser;
+      const institution: IInstitution = { id: 1070 };
+      applicationUser.institution = institution;
 
       activatedRoute.data = of({ applicationUser });
       comp.ngOnInit();
 
       expect(comp.usersSharedCollection).toContain(systemUser);
+      expect(comp.institutionsSharedCollection).toContain(institution);
       expect(comp.applicationUser).toEqual(applicationUser);
     });
   });
@@ -158,6 +187,16 @@ describe('ApplicationUser Management Update Component', () => {
         jest.spyOn(userService, 'compareUser');
         comp.compareUser(entity, entity2);
         expect(userService.compareUser).toHaveBeenCalledWith(entity, entity2);
+      });
+    });
+
+    describe('compareInstitution', () => {
+      it('Should forward to institutionService', () => {
+        const entity = { id: 123 };
+        const entity2 = { id: 456 };
+        jest.spyOn(institutionService, 'compareInstitution');
+        comp.compareInstitution(entity, entity2);
+        expect(institutionService.compareInstitution).toHaveBeenCalledWith(entity, entity2);
       });
     });
   });

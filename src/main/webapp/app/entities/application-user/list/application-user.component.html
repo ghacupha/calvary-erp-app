@@ -154,6 +154,12 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="institution.name">
+              <div class="d-flex">
+                <span>Institution</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -175,6 +181,13 @@
               <td>{{ applicationUser.resetDate | formatMediumDatetime }}</td>
               <td>
                 {{ applicationUser.systemUser?.login }}
+              </td>
+              <td>
+                @if (applicationUser.institution) {
+                  <div>
+                    <a [routerLink]="['/institution', applicationUser.institution.id, 'view']">{{ applicationUser.institution.name }}</a>
+                  </div>
+                }
               </td>
               <td class="text-end">
                 <div class="btn-group">

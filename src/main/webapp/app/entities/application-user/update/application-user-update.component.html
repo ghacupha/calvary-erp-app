@@ -113,6 +113,32 @@
             }
           </div>
         }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_institution">Institution</label>
+          <select
+            class="form-control"
+            id="field_institution"
+            data-cy="institution"
+            name="institution"
+            formControlName="institution"
+            [compareWith]="compareInstitution"
+          >
+            @if (!editForm.get('institution')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (institutionOption of institutionsSharedCollection; track $index) {
+              <option [ngValue]="institutionOption">{{ institutionOption.name }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['institution'])!.invalid && (editForm.get(['institution'])!.dirty || editForm.get(['institution'])!.touched)) {
+          <div>
+            @if (editForm.get(['institution'])?.errors?.required) {
+              <small class="form-text text-danger">This field is required.</small>
+            }
+          </div>
+        }
       </div>
 
       <div>

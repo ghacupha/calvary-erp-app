@@ -66,6 +66,8 @@ public class ApplicationUserAsserts {
      * @param actual the actual entity
      */
     public static void assertApplicationUserUpdatableRelationshipsEquals(ApplicationUser expected, ApplicationUser actual) {
-        // empty method
+        assertThat(expected)
+            .as("Verify ApplicationUser relationships")
+            .satisfies(e -> assertThat(e.getInstitution()).as("check institution").isEqualTo(actual.getInstitution()));
     }
 }

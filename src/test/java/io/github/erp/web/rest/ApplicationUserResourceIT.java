@@ -1068,7 +1068,14 @@ class ApplicationUserResourceIT {
         ApplicationUser partialUpdatedApplicationUser = new ApplicationUser();
         partialUpdatedApplicationUser.setId(applicationUser.getId());
 
-        partialUpdatedApplicationUser.langKey(UPDATED_LANG_KEY).imageUrl(UPDATED_IMAGE_URL).activationKey(UPDATED_ACTIVATION_KEY);
+        partialUpdatedApplicationUser
+            .username(UPDATED_USERNAME)
+            .lastName(UPDATED_LAST_NAME)
+            .email(UPDATED_EMAIL)
+            .activated(UPDATED_ACTIVATED)
+            .imageUrl(UPDATED_IMAGE_URL)
+            .activationKey(UPDATED_ACTIVATION_KEY)
+            .resetKey(UPDATED_RESET_KEY);
 
         webTestClient
             .patch()

@@ -3,35 +3,36 @@ import dayjs from 'dayjs/esm';
 import { IApplicationUser, NewApplicationUser } from './application-user.model';
 
 export const sampleWithRequiredData: IApplicationUser = {
-  id: 8770,
-  username: 'wide stealthily',
+  id: 2592,
+  username: 'although',
 };
 
 export const sampleWithPartialData: IApplicationUser = {
-  id: 2779,
-  username: 'oh unto barring',
-  lastName: 'Mann',
-  activated: true,
-  langKey: 'between',
-  resetKey: 'uh-huh dimly',
+  id: 1808,
+  username: 'sermon forenenst',
+  firstName: 'Camron',
+  lastName: 'Legros',
+  email: 'Sheila39@hotmail.com',
+  imageUrl: 'tunnel',
+  activationKey: 'off',
 };
 
 export const sampleWithFullData: IApplicationUser = {
-  id: 10749,
-  username: 'meanwhile converse',
-  firstName: 'Krystal',
-  lastName: 'Ferry',
-  email: 'Saige_Dooley@hotmail.com',
+  id: 24786,
+  username: 'date',
+  firstName: 'Brenda',
+  lastName: 'Homenick',
+  email: 'Talia.Reinger@gmail.com',
   activated: true,
-  langKey: 'until',
-  imageUrl: 'sick',
-  activationKey: 'gallop gentleman',
-  resetKey: 'surprisingly exactly',
-  resetDate: dayjs('2024-09-30T08:39'),
+  langKey: 'upright',
+  imageUrl: 'encourage unless so',
+  activationKey: 'mortal spherical without',
+  resetKey: 'rash whether',
+  resetDate: dayjs('2024-09-30T05:07'),
 };
 
 export const sampleWithNewData: NewApplicationUser = {
-  username: 'now',
+  username: 'unwrap',
   id: null,
 };
 

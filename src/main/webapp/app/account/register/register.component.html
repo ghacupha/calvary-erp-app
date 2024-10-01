@@ -30,6 +30,15 @@
       @if (!success()) {
         <form name="form" (ngSubmit)="register()" [formGroup]="registerForm">
           <div class="mb-3">
+            <label class="form-label" for="institution">Institution</label>
+            <select id="institution" class="form-control" formControlName="institutionId" required>
+              @for (institution of institutions; track $index) {
+                <option [value]="institution.id">{{ institution.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="mb-3">
             <label class="form-label" for="login">Username</label>
             <input
               type="text"

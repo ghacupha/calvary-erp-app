@@ -18,6 +18,8 @@ public class AdminUserDTO implements Serializable {
 
     private Long id;
 
+    private Long institutionId;
+
     @NotBlank
     @Pattern(regexp = Constants.LOGIN_REGEX)
     @Size(min = 1, max = 50)
@@ -175,6 +177,15 @@ public class AdminUserDTO implements Serializable {
         this.authorities = authorities;
     }
 
+    public Long institutionId() {
+        return institutionId;
+    }
+
+    public AdminUserDTO setInstitutionId(Long institutionId) {
+        this.institutionId = institutionId;
+        return this;
+    }
+
     // prettier-ignore
     @Override
     public String toString() {
@@ -183,6 +194,7 @@ public class AdminUserDTO implements Serializable {
             ", firstName='" + firstName + '\'' +
             ", lastName='" + lastName + '\'' +
             ", email='" + email + '\'' +
+            ", institutionId='" + institutionId + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
             ", activated=" + activated +
             ", langKey='" + langKey + '\'' +

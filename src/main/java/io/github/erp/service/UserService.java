@@ -1,15 +1,19 @@
 package io.github.erp.service;
 
 import io.github.erp.config.Constants;
+import io.github.erp.domain.ApplicationUser;
 import io.github.erp.domain.Authority;
 import io.github.erp.domain.User;
+import io.github.erp.repository.ApplicationUserRepository;
 import io.github.erp.repository.AuthorityRepository;
+import io.github.erp.repository.InstitutionRepository;
 import io.github.erp.repository.UserRepository;
 import io.github.erp.repository.search.UserSearchRepository;
 import io.github.erp.security.AuthoritiesConstants;
 import io.github.erp.security.SecurityUtils;
 import io.github.erp.service.dto.AdminUserDTO;
 import io.github.erp.service.dto.UserDTO;
+import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -41,17 +45,25 @@ public class UserService {
 
     private final UserSearchRepository userSearchRepository;
 
+    private final InstitutionRepository institutionRepository;
+
+    private final ApplicationUserRepository applicationUserRepository;
+
     private final AuthorityRepository authorityRepository;
 
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         UserSearchRepository userSearchRepository,
+        InstitutionRepository institutionRepository,
+        ApplicationUserRepository applicationUserRepository,
         AuthorityRepository authorityRepository
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userSearchRepository = userSearchRepository;
+        this.institutionRepository = institutionRepository;
+        this.applicationUserRepository = applicationUserRepository;
         this.authorityRepository = authorityRepository;
     }
 
@@ -151,7 +163,19 @@ public class UserService {
                     .flatMap(this::saveUser)
                     .flatMap(user -> userSearchRepository.save(user).thenReturn(user))
                     .doOnNext(user -> LOG.debug("Created Information for User: {}", user));
-            });
+            })
+            .flatMap(newUser ->
+                institutionRepository
+                    .findById(userDTO.institutionId())
+                    .switchIfEmpty(Mono.error(new EntityNotFoundException("Institution not found")))
+                    .flatMap(institution -> {
+                        ApplicationUser applicationUser = new ApplicationUser();
+                        applicationUser.setSystemUser(newUser);
+                        applicationUser.setInstitution(institution);
+                        return applicationUserRepository.save(applicationUser);
+                    })
+                    .thenReturn(newUser)
+            );
     }
 
     @Transactional

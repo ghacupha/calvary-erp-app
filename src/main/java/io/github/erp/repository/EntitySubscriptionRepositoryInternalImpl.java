@@ -100,6 +100,21 @@ class EntitySubscriptionRepositoryInternalImpl
         return createQuery(null, whereClause).one();
     }
 
+    @Override
+    public Mono<EntitySubscription> findOneWithEagerRelationships(Long id) {
+        return findById(id);
+    }
+
+    @Override
+    public Flux<EntitySubscription> findAllWithEagerRelationships() {
+        return findAll();
+    }
+
+    @Override
+    public Flux<EntitySubscription> findAllWithEagerRelationships(Pageable page) {
+        return findAllBy(page);
+    }
+
     private EntitySubscription process(Row row, RowMetadata metadata) {
         EntitySubscription entity = entitysubscriptionMapper.apply(row, "e");
         entity.setInstitution(institutionMapper.apply(row, "institution"));

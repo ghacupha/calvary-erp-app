@@ -93,6 +93,10 @@ public class EntitySubscriptionServiceImpl implements EntitySubscriptionService 
         return entitySubscriptionRepository.countByCriteria(criteria);
     }
 
+    public Flux<EntitySubscriptionDTO> findAllWithEagerRelationships(Pageable pageable) {
+        return entitySubscriptionRepository.findAllWithEagerRelationships(pageable).map(entitySubscriptionMapper::toDto);
+    }
+
     public Mono<Long> countAll() {
         return entitySubscriptionRepository.count();
     }
@@ -105,7 +109,7 @@ public class EntitySubscriptionServiceImpl implements EntitySubscriptionService 
     @Transactional(readOnly = true)
     public Mono<EntitySubscriptionDTO> findOne(Long id) {
         LOG.debug("Request to get EntitySubscription : {}", id);
-        return entitySubscriptionRepository.findById(id).map(entitySubscriptionMapper::toDto);
+        return entitySubscriptionRepository.findOneWithEagerRelationships(id).map(entitySubscriptionMapper::toDto);
     }
 
     @Override

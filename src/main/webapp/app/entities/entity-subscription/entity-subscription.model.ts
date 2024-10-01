@@ -6,7 +6,7 @@ export interface IEntitySubscription {
   subscriptionToken?: string | null;
   startDate?: dayjs.Dayjs | null;
   endDate?: dayjs.Dayjs | null;
-  institution?: Pick<IInstitution, 'id'> | null;
+  institution?: Pick<IInstitution, 'id' | 'name'> | null;
 }
 
 export type NewEntitySubscription = Omit<IEntitySubscription, 'id'> & { id: null };

@@ -17,6 +17,7 @@ import io.github.erp.repository.EntityManager;
 import io.github.erp.repository.EntitySubscriptionRepository;
 import io.github.erp.repository.InstitutionRepository;
 import io.github.erp.repository.search.EntitySubscriptionSearchRepository;
+import io.github.erp.service.EntitySubscriptionService;
 import io.github.erp.service.dto.EntitySubscriptionDTO;
 import io.github.erp.service.mapper.EntitySubscriptionMapper;
 import java.time.Instant;
@@ -32,17 +33,22 @@ import org.assertj.core.util.IterableUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.data.util.Streamable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 
 /**
  * Integration tests for the {@link EntitySubscriptionResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureWebTestClient(timeout = IntegrationTest.DEFAULT_ENTITY_TIMEOUT)
 @WithMockUser
 class EntitySubscriptionResourceIT {
@@ -71,8 +77,14 @@ class EntitySubscriptionResourceIT {
     @Autowired
     private EntitySubscriptionRepository entitySubscriptionRepository;
 
+    @Mock
+    private EntitySubscriptionRepository entitySubscriptionRepositoryMock;
+
     @Autowired
     private EntitySubscriptionMapper entitySubscriptionMapper;
+
+    @Mock
+    private EntitySubscriptionService entitySubscriptionServiceMock;
 
     @Autowired
     private EntitySubscriptionSearchRepository entitySubscriptionSearchRepository;
@@ -299,6 +311,23 @@ class EntitySubscriptionResourceIT {
             .value(hasItem(sameInstant(DEFAULT_START_DATE)))
             .jsonPath("$.[*].endDate")
             .value(hasItem(sameInstant(DEFAULT_END_DATE)));
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllEntitySubscriptionsWithEagerRelationshipsIsEnabled() {
+        when(entitySubscriptionServiceMock.findAllWithEagerRelationships(any())).thenReturn(Flux.empty());
+
+        webTestClient.get().uri(ENTITY_API_URL + "?eagerload=true").exchange().expectStatus().isOk();
+
+        verify(entitySubscriptionServiceMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllEntitySubscriptionsWithEagerRelationshipsIsNotEnabled() {
+        when(entitySubscriptionServiceMock.findAllWithEagerRelationships(any())).thenReturn(Flux.empty());
+
+        webTestClient.get().uri(ENTITY_API_URL + "?eagerload=false").exchange().expectStatus().isOk();
+        verify(entitySubscriptionRepositoryMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @Test

@@ -147,6 +147,7 @@ export class EntitySubscriptionComponent implements OnInit {
     const queryObject: any = {
       page: pageToLoad - 1,
       size: this.itemsPerPage,
+      eagerload: true,
       query: currentSearch,
       sort: this.sortService.buildSortParam(this.sortState()),
     };

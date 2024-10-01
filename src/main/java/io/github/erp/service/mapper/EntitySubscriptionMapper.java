@@ -11,11 +11,12 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface EntitySubscriptionMapper extends EntityMapper<EntitySubscriptionDTO, EntitySubscription> {
-    @Mapping(target = "institution", source = "institution", qualifiedByName = "institutionId")
+    @Mapping(target = "institution", source = "institution", qualifiedByName = "institutionName")
     EntitySubscriptionDTO toDto(EntitySubscription s);
 
-    @Named("institutionId")
+    @Named("institutionName")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    InstitutionDTO toDtoInstitutionId(Institution institution);
+    @Mapping(target = "name", source = "name")
+    InstitutionDTO toDtoInstitutionName(Institution institution);
 }

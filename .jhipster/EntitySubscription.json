@@ -24,6 +24,15 @@
   "name": "EntitySubscription",
   "pagination": "pagination",
   "readOnly": false,
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityField": "name",
+      "otherEntityName": "institution",
+      "otherEntityRelationshipName": "entitySubscription",
+      "relationshipName": "institution",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
   "service": "serviceImpl"
 }

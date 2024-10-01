@@ -18,6 +18,15 @@ public interface EntitySubscriptionRepository
     extends ReactiveCrudRepository<EntitySubscription, Long>, EntitySubscriptionRepositoryInternal {
     Flux<EntitySubscription> findAllBy(Pageable pageable);
 
+    @Override
+    Mono<EntitySubscription> findOneWithEagerRelationships(Long id);
+
+    @Override
+    Flux<EntitySubscription> findAllWithEagerRelationships();
+
+    @Override
+    Flux<EntitySubscription> findAllWithEagerRelationships(Pageable page);
+
     @Query("SELECT * FROM entity_subscription entity WHERE entity.institution_id = :id")
     Flux<EntitySubscription> findByInstitution(Long id);
 
@@ -50,4 +59,12 @@ interface EntitySubscriptionRepositoryInternal {
     Flux<EntitySubscription> findByCriteria(EntitySubscriptionCriteria criteria, Pageable pageable);
 
     Mono<Long> countByCriteria(EntitySubscriptionCriteria criteria);
+
+    Mono<EntitySubscription> findOneWithEagerRelationships(Long id);
+
+    Flux<EntitySubscription> findAllWithEagerRelationships();
+
+    Flux<EntitySubscription> findAllWithEagerRelationships(Pageable page);
+
+    Mono<Void> deleteById(Long id);
 }

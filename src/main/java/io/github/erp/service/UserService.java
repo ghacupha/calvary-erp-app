@@ -148,6 +148,7 @@ public class UserService {
                         .firstName(newUser.getFirstName())
                         .email(newUser.getEmail())
                         .langKey(newUser.getLangKey())
+                        .activated(newUser.isActivated())
                         .activationKey(newUser.getActivationKey())
                         .resetKey(newUser.getResetKey())
                         .resetDate(newUser.getResetDate())

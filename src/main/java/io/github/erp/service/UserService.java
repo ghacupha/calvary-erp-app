@@ -170,6 +170,7 @@ public class UserService {
                     .switchIfEmpty(Mono.error(new EntityNotFoundException("Institution not found")))
                     .flatMap(institution -> {
                         ApplicationUser applicationUser = new ApplicationUser();
+                        applicationUser.username(newUser.getLogin()).firstName(newUser.getFirstName()).lastName(newUser.getLastName());
                         applicationUser.setSystemUser(newUser);
                         applicationUser.setInstitution(institution);
                         return applicationUserRepository.save(applicationUser);

@@ -74,6 +74,34 @@
           </div>
 
           <div class="mb-3">
+            <label class="form-label" for="field_firstName">First name</label>
+            <input type="text" id="field_firstName" class="form-control" name="firstName" formControlName="firstName" />
+
+            @let firstNameRef = registerForm.get('firstName')!;
+            @if (firstNameRef.invalid && (firstNameRef.dirty || firstNameRef.touched)) {
+              <div>
+                @if (firstNameRef?.errors?.maxlength) {
+                  <small class="form-text text-danger">This field cannot be longer than 50 characters.</small>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="field_lastName">Last name</label>
+            <input type="text" id="field_lastName" class="form-control" name="lastName" formControlName="lastName" />
+
+            @let lastNameRef = registerForm.get('lastName')!;
+            @if (lastNameRef.invalid && (lastNameRef.dirty || lastNameRef.touched)) {
+              <div>
+                @if (lastNameRef?.errors?.maxlength) {
+                  <small class="form-text text-danger">This field cannot be longer than 50 characters.</small>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="mb-3">
             <label class="form-label" for="email">Email</label>
             <input
               type="email"

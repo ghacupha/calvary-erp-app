@@ -49,7 +49,18 @@ export default class RegisterComponent implements AfterViewInit, OnInit {
       nonNullable: true,
       validators: [Validators.required, Validators.minLength(4), Validators.maxLength(50)],
     }),
-    institutionId: new FormControl('', Validators.required),
+    institutionId: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
+    firstName: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(50)],
+    }),
+    lastName: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(50)],
+    }),
   });
 
   private registerService = inject(RegisterService);
@@ -79,9 +90,9 @@ export default class RegisterComponent implements AfterViewInit, OnInit {
     if (password !== confirmPassword) {
       this.doNotMatch.set(true);
     } else {
-      const { login, email } = this.registerForm.getRawValue();
+      const { login, email, institutionId, firstName, lastName } = this.registerForm.getRawValue();
       this.registerService
-        .save({ login, email, password, langKey: 'en' })
+        .save({ login, email, password, institutionId, firstName, lastName, langKey: 'en' })
         .subscribe({ next: () => this.success.set(true), error: response => this.processError(response) });
     }
   }

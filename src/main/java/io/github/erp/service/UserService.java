@@ -52,13 +52,16 @@ public class UserService {
 
     private final AuthorityRepository authorityRepository;
 
+    private final EntitySubscriptionService entitySubscriptionService;
+
     public UserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         UserSearchRepository userSearchRepository,
         InstitutionRepository institutionRepository,
         ApplicationUserRepository applicationUserRepository,
-        AuthorityRepository authorityRepository
+        AuthorityRepository authorityRepository,
+        EntitySubscriptionService entitySubscriptionService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -66,6 +69,7 @@ public class UserService {
         this.institutionRepository = institutionRepository;
         this.applicationUserRepository = applicationUserRepository;
         this.authorityRepository = authorityRepository;
+        this.entitySubscriptionService = entitySubscriptionService;
     }
 
     @Transactional
@@ -115,15 +119,24 @@ public class UserService {
 
     @Transactional
     public Mono<User> registerUser(AdminUserDTO userDTO, String password) {
-        return userRepository
-            .findOneByLogin(userDTO.getLogin().toLowerCase())
-            .flatMap(checkIfUserIsUniqueThrowOtherwise(Mono.error(new UsernameAlreadyUsedException())))
-            .then(userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()))
-            .flatMap(checkIfUserIsUniqueThrowOtherwise(Mono.error(new EmailAlreadyUsedException())))
-            .publishOn(Schedulers.boundedElastic())
-            .then(createNewUser(userDTO, password))
-            .flatMap(updateUserProfile())
-            .flatMap(createApplicationUser(userDTO));
+        return entitySubscriptionService
+            .hasValidSubscription(userDTO.institutionId())
+            .flatMap(hasValidSubscription -> {
+                if (!hasValidSubscription) {
+                    return Mono.error(
+                        new SubscriptionExpiredException("No valid subscription found for the institution # " + userDTO.institutionId())
+                    );
+                }
+                return userRepository
+                    .findOneByLogin(userDTO.getLogin().toLowerCase())
+                    .flatMap(checkIfUserIsUniqueThrowOtherwise(Mono.error(new UsernameAlreadyUsedException())))
+                    .then(userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()))
+                    .flatMap(checkIfUserIsUniqueThrowOtherwise(Mono.error(new EmailAlreadyUsedException())))
+                    .publishOn(Schedulers.boundedElastic())
+                    .then(createNewUser(userDTO, password))
+                    .flatMap(updateUserProfile())
+                    .flatMap(createApplicationUser(userDTO));
+            });
     }
 
     private Function<User, Mono<? extends Void>> checkIfUserIsUniqueThrowOtherwise(Mono<Void> error) {
@@ -391,6 +404,7 @@ public class UserService {
 
     /**
      * Gets a list of all the authorities.
+     *
      * @return a list of all the authorities.
      */
     @Transactional(readOnly = true)

@@ -6,6 +6,7 @@ import io.github.erp.repository.search.EntitySubscriptionSearchRepository;
 import io.github.erp.service.EntitySubscriptionService;
 import io.github.erp.service.dto.EntitySubscriptionDTO;
 import io.github.erp.service.mapper.EntitySubscriptionMapper;
+import java.time.ZonedDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,11 @@ public class EntitySubscriptionServiceImpl implements EntitySubscriptionService 
         this.entitySubscriptionRepository = entitySubscriptionRepository;
         this.entitySubscriptionMapper = entitySubscriptionMapper;
         this.entitySubscriptionSearchRepository = entitySubscriptionSearchRepository;
+    }
+
+    @Override
+    public Mono<Boolean> hasValidSubscription(Long institutionId) {
+        return entitySubscriptionRepository.findByInstitutionIdAndEndDateAfter(institutionId, ZonedDateTime.now()).hasElements();
     }
 
     @Override

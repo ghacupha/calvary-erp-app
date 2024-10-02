@@ -2,6 +2,7 @@ package io.github.erp.repository;
 
 import io.github.erp.domain.EntitySubscription;
 import io.github.erp.domain.criteria.EntitySubscriptionCriteria;
+import java.time.ZonedDateTime;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -44,6 +45,14 @@ public interface EntitySubscriptionRepository
 
     @Override
     Mono<Void> deleteById(Long id);
+
+    /**
+     * Checks for existence of current and active subscription
+     * @param institutionId
+     * @param today
+     * @return
+     */
+    Flux<EntitySubscription> findByInstitutionIdAndEndDateAfter(Long institutionId, ZonedDateTime today);
 }
 
 interface EntitySubscriptionRepositoryInternal {

@@ -94,4 +94,11 @@ public interface EntitySubscriptionService {
      * @return the list of entities.
      */
     Flux<EntitySubscriptionDTO> search(String query, Pageable pageable);
+
+    /**
+     * Checks for existence of current and active subscription
+     * @param institutionId id of the institution to which the subscription belongs
+     * @return whether there exists a current subscription
+     */
+    Mono<Boolean> hasValidSubscription(Long institutionId);
 }

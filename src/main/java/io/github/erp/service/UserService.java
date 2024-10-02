@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -116,67 +117,82 @@ public class UserService {
     public Mono<User> registerUser(AdminUserDTO userDTO, String password) {
         return userRepository
             .findOneByLogin(userDTO.getLogin().toLowerCase())
-            .flatMap(existingUser -> {
-                if (!existingUser.isActivated()) {
-                    return userRepository.delete(existingUser);
-                } else {
-                    return Mono.error(new UsernameAlreadyUsedException());
-                }
-            })
+            .flatMap(checkIfUserIsUniqueThrowOtherwise(Mono.error(new UsernameAlreadyUsedException())))
             .then(userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()))
-            .flatMap(existingUser -> {
-                if (!existingUser.isActivated()) {
-                    return userRepository.delete(existingUser);
-                } else {
-                    return Mono.error(new EmailAlreadyUsedException());
-                }
-            })
+            .flatMap(checkIfUserIsUniqueThrowOtherwise(Mono.error(new EmailAlreadyUsedException())))
             .publishOn(Schedulers.boundedElastic())
-            .then(
-                Mono.fromCallable(() -> {
-                    User newUser = new User();
-                    String encryptedPassword = passwordEncoder.encode(password);
-                    newUser.setLogin(userDTO.getLogin().toLowerCase());
-                    // new user gets initially a generated password
-                    newUser.setPassword(encryptedPassword);
-                    newUser.setFirstName(userDTO.getFirstName());
-                    newUser.setLastName(userDTO.getLastName());
-                    if (userDTO.getEmail() != null) {
-                        newUser.setEmail(userDTO.getEmail().toLowerCase());
-                    }
-                    newUser.setImageUrl(userDTO.getImageUrl());
-                    newUser.setLangKey(userDTO.getLangKey());
-                    // new user is not active
-                    newUser.setActivated(false);
-                    // new user gets registration key
-                    newUser.setActivationKey(RandomUtil.generateActivationKey());
-                    return newUser;
+            .then(createNewUser(userDTO, password))
+            .flatMap(updateUserProfile())
+            .flatMap(createApplicationUser(userDTO));
+    }
+
+    private Function<User, Mono<? extends Void>> checkIfUserIsUniqueThrowOtherwise(Mono<Void> error) {
+        return existingUser -> {
+            if (!existingUser.isActivated()) {
+                return userRepository.delete(existingUser);
+            } else {
+                return error;
+            }
+        };
+    }
+
+    private Function<User, Mono<? extends User>> createApplicationUser(AdminUserDTO userDTO) {
+        return newUser ->
+            institutionRepository
+                .findById(userDTO.institutionId())
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Institution not found")))
+                .flatMap(institution -> {
+                    ApplicationUser applicationUser = new ApplicationUser();
+                    applicationUser
+                        .username(newUser.getLogin())
+                        .firstName(newUser.getFirstName())
+                        .email(newUser.getEmail())
+                        .langKey(newUser.getLangKey())
+                        .activationKey(newUser.getActivationKey())
+                        .resetKey(newUser.getResetKey())
+                        .resetDate(newUser.getResetDate())
+                        .lastName(newUser.getLastName());
+                    applicationUser.setSystemUser(newUser);
+                    applicationUser.setInstitution(institution);
+                    return applicationUserRepository.save(applicationUser);
                 })
-            )
-            .flatMap(newUser -> {
-                Set<Authority> authorities = new HashSet<>();
-                return authorityRepository
-                    .findById(AuthoritiesConstants.USER)
-                    .map(authorities::add)
-                    .thenReturn(newUser)
-                    .doOnNext(user -> user.setAuthorities(authorities))
-                    .flatMap(this::saveUser)
-                    .flatMap(user -> userSearchRepository.save(user).thenReturn(user))
-                    .doOnNext(user -> LOG.debug("Created Information for User: {}", user));
-            })
-            .flatMap(newUser ->
-                institutionRepository
-                    .findById(userDTO.institutionId())
-                    .switchIfEmpty(Mono.error(new EntityNotFoundException("Institution not found")))
-                    .flatMap(institution -> {
-                        ApplicationUser applicationUser = new ApplicationUser();
-                        applicationUser.username(newUser.getLogin()).firstName(newUser.getFirstName()).lastName(newUser.getLastName());
-                        applicationUser.setSystemUser(newUser);
-                        applicationUser.setInstitution(institution);
-                        return applicationUserRepository.save(applicationUser);
-                    })
-                    .thenReturn(newUser)
-            );
+                .thenReturn(newUser);
+    }
+
+    private Function<User, Mono<? extends User>> updateUserProfile() {
+        return newUser -> {
+            Set<Authority> authorities = new HashSet<>();
+            return authorityRepository
+                .findById(AuthoritiesConstants.USER)
+                .map(authorities::add)
+                .thenReturn(newUser)
+                .doOnNext(user -> user.setAuthorities(authorities))
+                .flatMap(this::saveUser)
+                .flatMap(user -> userSearchRepository.save(user).thenReturn(user))
+                .doOnNext(user -> LOG.debug("Created Information for User: {}", user));
+        };
+    }
+
+    private Mono<User> createNewUser(AdminUserDTO userDTO, String password) {
+        return Mono.fromCallable(() -> {
+            User newUser = new User();
+            String encryptedPassword = passwordEncoder.encode(password);
+            newUser.setLogin(userDTO.getLogin().toLowerCase());
+            // new user gets initially a generated password
+            newUser.setPassword(encryptedPassword);
+            newUser.setFirstName(userDTO.getFirstName());
+            newUser.setLastName(userDTO.getLastName());
+            if (userDTO.getEmail() != null) {
+                newUser.setEmail(userDTO.getEmail().toLowerCase());
+            }
+            newUser.setImageUrl(userDTO.getImageUrl());
+            newUser.setLangKey(userDTO.getLangKey());
+            // new user is not active
+            newUser.setActivated(false);
+            // new user gets registration key
+            newUser.setActivationKey(RandomUtil.generateActivationKey());
+            return newUser;
+        });
     }
 
     @Transactional

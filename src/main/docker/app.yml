@@ -2,7 +2,7 @@
 version: '3.3'
 services:
   calvary-gateway-api:
-    image: ghacupha/calvary-erp-api:0.0.1-SNAPSHOT
+    image: ghacupha/calvary-erp-app:0.0.1-SNAPSHOT
     volumes:
       - ./logs/:/logs/
       - ./reports-directory/:/reports-directory/

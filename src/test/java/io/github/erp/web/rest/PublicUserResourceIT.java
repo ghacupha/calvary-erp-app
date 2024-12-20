@@ -1,32 +1,42 @@
 package io.github.erp.web.rest;
 
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import io.github.erp.IntegrationTest;
 import io.github.erp.domain.User;
 import io.github.erp.repository.UserRepository;
 import io.github.erp.repository.search.UserSearchRepository;
 import io.github.erp.security.AuthoritiesConstants;
+import io.github.erp.service.UserService;
+import java.util.Objects;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Integration tests for the {@link PublicUserResource} REST controller.
  */
-@AutoConfigureWebTestClient(timeout = IntegrationTest.DEFAULT_TIMEOUT)
+@AutoConfigureMockMvc
 @WithMockUser(authorities = AuthoritiesConstants.ADMIN)
 @IntegrationTest
 class PublicUserResourceIT {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * This repository is mocked in the io.github.erp.repository.search test package.
@@ -37,9 +47,18 @@ class PublicUserResourceIT {
     private UserSearchRepository mockUserSearchRepository;
 
     @Autowired
-    private WebTestClient webTestClient;
+    private CacheManager cacheManager;
+
+    @Autowired
+    private MockMvc restUserMockMvc;
 
     private User user;
+    private Long numberOfUsers;
+
+    @BeforeEach
+    public void countUsers() {
+        numberOfUsers = userRepository.count();
+    }
 
     @BeforeEach
     public void initTest() {
@@ -48,64 +67,46 @@ class PublicUserResourceIT {
 
     @AfterEach
     public void cleanupAndCheck() {
-        userRepository.deleteAllUserAuthorities().block();
-        userRepository.deleteAll().block();
+        cacheManager
+            .getCacheNames()
+            .stream()
+            .map(cacheName -> this.cacheManager.getCache(cacheName))
+            .filter(Objects::nonNull)
+            .forEach(Cache::clear);
+        userService.deleteUser(user.getLogin());
+        assertThat(userRepository.count()).isEqualTo(numberOfUsers);
+        numberOfUsers = null;
     }
 
     @Test
-    void getAllPublicUsers() {
+    @Transactional
+    void getAllPublicUsers() throws Exception {
         // Initialize the database
-        userRepository.save(user).block();
+        userRepository.saveAndFlush(user);
 
         // Get all the users
-        webTestClient
-            .get()
-            .uri("/api/users?sort=id,desc")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectHeader()
-            .contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.[?(@.id == %d)].login", user.getId())
-            .isEqualTo(user.getLogin())
-            .jsonPath("$.[?(@.id == %d)].keys()", user.getId())
-            .isEqualTo(Set.of("id", "login"))
-            .jsonPath("$.[*].email")
-            .doesNotHaveJsonPath()
-            .jsonPath("$.[*].imageUrl")
-            .doesNotHaveJsonPath()
-            .jsonPath("$.[*].langKey")
-            .doesNotHaveJsonPath();
+        restUserMockMvc
+            .perform(get("/api/users?sort=id,desc").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[?(@.id == %d)].login", user.getId()).value(user.getLogin()))
+            .andExpect(jsonPath("$.[?(@.id == %d)].keys()", user.getId()).value(Set.of("id", "login")))
+            .andExpect(jsonPath("$.[*].email").doesNotHaveJsonPath())
+            .andExpect(jsonPath("$.[*].imageUrl").doesNotHaveJsonPath())
+            .andExpect(jsonPath("$.[*].langKey").doesNotHaveJsonPath());
     }
 
     @Test
+    @Transactional
     void getAllUsersSortedByParameters() throws Exception {
         // Initialize the database
-        userRepository.save(user).block();
+        userRepository.saveAndFlush(user);
 
-        webTestClient
-            .get()
-            .uri("/api/users?sort=resetKey,desc")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-        webTestClient
-            .get()
-            .uri("/api/users?sort=password,desc")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-        webTestClient
-            .get()
-            .uri("/api/users?sort=resetKey,desc&sort=id,desc")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-        webTestClient.get().uri("/api/users?sort=id,desc").accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk();
+        restUserMockMvc.perform(get("/api/users?sort=resetKey,desc").accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+        restUserMockMvc.perform(get("/api/users?sort=password,desc").accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+        restUserMockMvc
+            .perform(get("/api/users?sort=resetKey,desc&sort=id,desc").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+        restUserMockMvc.perform(get("/api/users?sort=id,desc").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
     }
 }

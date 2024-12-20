@@ -3,30 +3,30 @@ package io.github.erp.web.rest;
 import static io.github.erp.domain.AuthorityAsserts.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.erp.IntegrationTest;
 import io.github.erp.domain.Authority;
 import io.github.erp.repository.AuthorityRepository;
-import io.github.erp.repository.EntityManager;
-import java.time.Duration;
-import java.util.List;
+import jakarta.persistence.EntityManager;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Integration tests for the {@link AuthorityResource} REST controller.
  */
 @IntegrationTest
-@AutoConfigureWebTestClient(timeout = IntegrationTest.DEFAULT_ENTITY_TIMEOUT)
+@AutoConfigureMockMvc
 @WithMockUser(authorities = { "ROLE_ADMIN" })
 class AuthorityResourceIT {
 
@@ -43,7 +43,7 @@ class AuthorityResourceIT {
     private EntityManager em;
 
     @Autowired
-    private WebTestClient webTestClient;
+    private MockMvc restAuthorityMockMvc;
 
     private Authority authority;
 
@@ -69,14 +69,6 @@ class AuthorityResourceIT {
         return new Authority().name(UUID.randomUUID().toString());
     }
 
-    public static void deleteEntities(EntityManager em) {
-        try {
-            em.deleteAll(Authority.class).block();
-        } catch (Exception e) {
-            // It can fail, if other entities are still referring this - it will be removed later.
-        }
-    }
-
     @BeforeEach
     public void initTest() {
         authority = createEntity();
@@ -85,27 +77,25 @@ class AuthorityResourceIT {
     @AfterEach
     public void cleanup() {
         if (insertedAuthority != null) {
-            authorityRepository.delete(insertedAuthority).block();
+            authorityRepository.delete(insertedAuthority);
             insertedAuthority = null;
         }
-        deleteEntities(em);
     }
 
     @Test
+    @Transactional
     void createAuthority() throws Exception {
         long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Authority
-        var returnedAuthority = webTestClient
-            .post()
-            .uri(ENTITY_API_URL)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(authority))
-            .exchange()
-            .expectStatus()
-            .isCreated()
-            .expectBody(Authority.class)
-            .returnResult()
-            .getResponseBody();
+        var returnedAuthority = om.readValue(
+            restAuthorityMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(authority)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            Authority.class
+        );
 
         // Validate the Authority in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
@@ -115,133 +105,79 @@ class AuthorityResourceIT {
     }
 
     @Test
+    @Transactional
     void createAuthorityWithExistingId() throws Exception {
         // Create the Authority with an existing ID
-        insertedAuthority = authorityRepository.save(authority).block();
+        insertedAuthority = authorityRepository.saveAndFlush(authority);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        webTestClient
-            .post()
-            .uri(ENTITY_API_URL)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(authority))
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
+        restAuthorityMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(authority)))
+            .andExpect(status().isBadRequest());
 
         // Validate the Authority in the database
         assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
-    void getAllAuthoritiesAsStream() {
+    @Transactional
+    void getAllAuthorities() throws Exception {
         // Initialize the database
         authority.setName(UUID.randomUUID().toString());
-        authorityRepository.save(authority).block();
-
-        List<Authority> authorityList = webTestClient
-            .get()
-            .uri(ENTITY_API_URL)
-            .accept(MediaType.APPLICATION_NDJSON)
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectHeader()
-            .contentTypeCompatibleWith(MediaType.APPLICATION_NDJSON)
-            .returnResult(Authority.class)
-            .getResponseBody()
-            .filter(authority::equals)
-            .collectList()
-            .block(Duration.ofSeconds(5));
-
-        assertThat(authorityList).isNotNull();
-        assertThat(authorityList).hasSize(1);
-        Authority testAuthority = authorityList.get(0);
-
-        // Test fails because reactive api returns an empty object instead of null
-        // assertAuthorityAllPropertiesEquals(authority, testAuthority);
-        assertAuthorityUpdatableFieldsEquals(authority, testAuthority);
-    }
-
-    @Test
-    void getAllAuthorities() {
-        // Initialize the database
-        authority.setName(UUID.randomUUID().toString());
-        insertedAuthority = authorityRepository.save(authority).block();
+        insertedAuthority = authorityRepository.saveAndFlush(authority);
 
         // Get all the authorityList
-        webTestClient
-            .get()
-            .uri(ENTITY_API_URL + "?sort=name,desc")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectHeader()
-            .contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.[*].name")
-            .value(hasItem(authority.getName()));
+        restAuthorityMockMvc
+            .perform(get(ENTITY_API_URL + "?sort=name,desc"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.[*].name").value(hasItem(authority.getName())));
     }
 
     @Test
-    void getAuthority() {
+    @Transactional
+    void getAuthority() throws Exception {
         // Initialize the database
         authority.setName(UUID.randomUUID().toString());
-        insertedAuthority = authorityRepository.save(authority).block();
+        insertedAuthority = authorityRepository.saveAndFlush(authority);
 
         // Get the authority
-        webTestClient
-            .get()
-            .uri(ENTITY_API_URL_ID, authority.getName())
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectHeader()
-            .contentType(MediaType.APPLICATION_JSON)
-            .expectBody()
-            .jsonPath("$.name")
-            .value(is(authority.getName()));
+        restAuthorityMockMvc
+            .perform(get(ENTITY_API_URL_ID, authority.getName()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.name").value(authority.getName()));
     }
 
     @Test
-    void getNonExistingAuthority() {
+    @Transactional
+    void getNonExistingAuthority() throws Exception {
         // Get the authority
-        webTestClient
-            .get()
-            .uri(ENTITY_API_URL_ID, Long.MAX_VALUE)
-            .accept(MediaType.APPLICATION_PROBLEM_JSON)
-            .exchange()
-            .expectStatus()
-            .isNotFound();
+        restAuthorityMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
-    void deleteAuthority() {
+    @Transactional
+    void deleteAuthority() throws Exception {
         // Initialize the database
         authority.setName(UUID.randomUUID().toString());
-        insertedAuthority = authorityRepository.save(authority).block();
+        insertedAuthority = authorityRepository.saveAndFlush(authority);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the authority
-        webTestClient
-            .delete()
-            .uri(ENTITY_API_URL_ID, authority.getName())
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isNoContent();
+        restAuthorityMockMvc
+            .perform(delete(ENTITY_API_URL_ID, authority.getName()).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
         assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
     }
 
     protected long getRepositoryCount() {
-        return authorityRepository.count().block();
+        return authorityRepository.count();
     }
 
     protected void assertIncrementedRepositoryCount(long countBefore) {
@@ -257,18 +193,14 @@ class AuthorityResourceIT {
     }
 
     protected Authority getPersistedAuthority(Authority authority) {
-        return authorityRepository.findById(authority.getName()).block();
+        return authorityRepository.findById(authority.getName()).orElseThrow();
     }
 
     protected void assertPersistedAuthorityToMatchAllProperties(Authority expectedAuthority) {
-        // Test fails because reactive api returns an empty object instead of null
-        // assertAuthorityAllPropertiesEquals(expectedAuthority, getPersistedAuthority(expectedAuthority));
-        assertAuthorityUpdatableFieldsEquals(expectedAuthority, getPersistedAuthority(expectedAuthority));
+        assertAuthorityAllPropertiesEquals(expectedAuthority, getPersistedAuthority(expectedAuthority));
     }
 
     protected void assertPersistedAuthorityToMatchUpdatableProperties(Authority expectedAuthority) {
-        // Test fails because reactive api returns an empty object instead of null
-        // assertAuthorityAllUpdatablePropertiesEquals(expectedAuthority, getPersistedAuthority(expectedAuthority));
-        assertAuthorityUpdatableFieldsEquals(expectedAuthority, getPersistedAuthority(expectedAuthority));
+        assertAuthorityAllUpdatablePropertiesEquals(expectedAuthority, getPersistedAuthority(expectedAuthority));
     }
 }

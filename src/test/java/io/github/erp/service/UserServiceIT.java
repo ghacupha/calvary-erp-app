@@ -4,30 +4,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.erp.IntegrationTest;
-import io.github.erp.config.Constants;
 import io.github.erp.domain.User;
 import io.github.erp.repository.UserRepository;
 import io.github.erp.repository.search.UserSearchRepository;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.data.auditing.AuditingHandler;
+import org.springframework.data.auditing.DateTimeProvider;
+import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.security.RandomUtil;
 
 /**
  * Integration tests for {@link UserService}.
  */
 @IntegrationTest
+@Transactional
 class UserServiceIT {
 
     private static final String DEFAULT_LOGIN = "johndoe_service";
@@ -37,6 +44,9 @@ class UserServiceIT {
     private static final String DEFAULT_FIRSTNAME = "john";
 
     private static final String DEFAULT_LASTNAME = "doe";
+
+    @Autowired
+    private CacheManager cacheManager;
 
     private static final String DEFAULT_IMAGEURL = "http://placehold.it/50x50";
 
@@ -56,7 +66,20 @@ class UserServiceIT {
     @SpyBean
     private UserSearchRepository spiedUserSearchRepository;
 
+    @Autowired
+    private AuditingHandler auditingHandler;
+
+    @MockBean
+    private DateTimeProvider dateTimeProvider;
+
     private User user;
+
+    private Long numberOfUsers;
+
+    @BeforeEach
+    public void countUsers() {
+        numberOfUsers = userRepository.count();
+    }
 
     @BeforeEach
     public void init() {
@@ -69,22 +92,32 @@ class UserServiceIT {
         user.setLastName(DEFAULT_LASTNAME);
         user.setImageUrl(DEFAULT_IMAGEURL);
         user.setLangKey(DEFAULT_LANGKEY);
-        user.setCreatedBy(Constants.SYSTEM);
+
+        when(dateTimeProvider.getNow()).thenReturn(Optional.of(LocalDateTime.now()));
+        auditingHandler.setDateTimeProvider(dateTimeProvider);
     }
 
     @AfterEach
     public void cleanupAndCheck() {
-        userRepository.deleteAllUserAuthorities().block();
-        userRepository.deleteAll().block();
+        cacheManager
+            .getCacheNames()
+            .stream()
+            .map(cacheName -> this.cacheManager.getCache(cacheName))
+            .filter(Objects::nonNull)
+            .forEach(Cache::clear);
+        userService.deleteUser(DEFAULT_LOGIN);
+        assertThat(userRepository.count()).isEqualTo(numberOfUsers);
+        numberOfUsers = null;
     }
 
     @Test
+    @Transactional
     void assertThatUserMustExistToResetPassword() {
-        userRepository.save(user).block();
-        Optional<User> maybeUser = userService.requestPasswordReset("invalid.login@localhost").blockOptional();
+        userRepository.saveAndFlush(user);
+        Optional<User> maybeUser = userService.requestPasswordReset("invalid.login@localhost");
         assertThat(maybeUser).isNotPresent();
 
-        maybeUser = userService.requestPasswordReset(user.getEmail()).blockOptional();
+        maybeUser = userService.requestPasswordReset(user.getEmail());
         assertThat(maybeUser).isPresent();
         assertThat(maybeUser.orElse(null).getEmail()).isEqualTo(user.getEmail());
         assertThat(maybeUser.orElse(null).getResetDate()).isNotNull();
@@ -92,43 +125,47 @@ class UserServiceIT {
     }
 
     @Test
+    @Transactional
     void assertThatOnlyActivatedUserCanRequestPasswordReset() {
         user.setActivated(false);
-        userRepository.save(user).block();
+        userRepository.saveAndFlush(user);
 
-        Optional<User> maybeUser = userService.requestPasswordReset(user.getLogin()).blockOptional();
+        Optional<User> maybeUser = userService.requestPasswordReset(user.getLogin());
         assertThat(maybeUser).isNotPresent();
-        userRepository.delete(user).block();
+        userRepository.delete(user);
     }
 
     @Test
+    @Transactional
     void assertThatResetKeyMustNotBeOlderThan24Hours() {
         Instant daysAgo = Instant.now().minus(25, ChronoUnit.HOURS);
         String resetKey = RandomUtil.generateResetKey();
         user.setActivated(true);
         user.setResetDate(daysAgo);
         user.setResetKey(resetKey);
-        userRepository.save(user).block();
+        userRepository.saveAndFlush(user);
 
-        Optional<User> maybeUser = userService.completePasswordReset("johndoe2", user.getResetKey()).blockOptional();
+        Optional<User> maybeUser = userService.completePasswordReset("johndoe2", user.getResetKey());
         assertThat(maybeUser).isNotPresent();
-        userRepository.delete(user).block();
+        userRepository.delete(user);
     }
 
     @Test
+    @Transactional
     void assertThatResetKeyMustBeValid() {
         Instant daysAgo = Instant.now().minus(25, ChronoUnit.HOURS);
         user.setActivated(true);
         user.setResetDate(daysAgo);
         user.setResetKey("1234");
-        userRepository.save(user).block();
+        userRepository.saveAndFlush(user);
 
-        Optional<User> maybeUser = userService.completePasswordReset("johndoe2", user.getResetKey()).blockOptional();
+        Optional<User> maybeUser = userService.completePasswordReset("johndoe2", user.getResetKey());
         assertThat(maybeUser).isNotPresent();
-        userRepository.delete(user).block();
+        userRepository.delete(user);
     }
 
     @Test
+    @Transactional
     void assertThatUserCanResetPassword() {
         String oldPassword = user.getPassword();
         Instant daysAgo = Instant.now().minus(2, ChronoUnit.HOURS);
@@ -136,57 +173,55 @@ class UserServiceIT {
         user.setActivated(true);
         user.setResetDate(daysAgo);
         user.setResetKey(resetKey);
-        userRepository.save(user).block();
+        userRepository.saveAndFlush(user);
 
-        Optional<User> maybeUser = userService.completePasswordReset("johndoe2", user.getResetKey()).blockOptional();
+        Optional<User> maybeUser = userService.completePasswordReset("johndoe2", user.getResetKey());
         assertThat(maybeUser).isPresent();
         assertThat(maybeUser.orElse(null).getResetDate()).isNull();
         assertThat(maybeUser.orElse(null).getResetKey()).isNull();
         assertThat(maybeUser.orElse(null).getPassword()).isNotEqualTo(oldPassword);
 
-        userRepository.delete(user).block();
+        userRepository.delete(user);
     }
 
     @Test
+    @Transactional
     void assertThatNotActivatedUsersWithNotNullActivationKeyCreatedBefore3DaysAreDeleted() {
         Instant now = Instant.now();
+        when(dateTimeProvider.getNow()).thenReturn(Optional.of(now.minus(4, ChronoUnit.DAYS)));
         user.setActivated(false);
         user.setActivationKey(RandomStringUtils.random(20));
-        User dbUser = userRepository.save(user).block();
+        User dbUser = userRepository.saveAndFlush(user);
         dbUser.setCreatedDate(now.minus(4, ChronoUnit.DAYS));
-        userRepository.save(user).block();
-        LocalDateTime threeDaysAgo = LocalDateTime.ofInstant(now.minus(3, ChronoUnit.DAYS), ZoneOffset.UTC);
-        List<User> users = userRepository
-            .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(threeDaysAgo)
-            .collectList()
-            .block();
+        userRepository.saveAndFlush(user);
+        Instant threeDaysAgo = now.minus(3, ChronoUnit.DAYS);
+        List<User> users = userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(threeDaysAgo);
         assertThat(users).isNotEmpty();
         userService.removeNotActivatedUsers();
-        users = userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(threeDaysAgo).collectList().block();
+        users = userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(threeDaysAgo);
         assertThat(users).isEmpty();
 
         // Verify Elasticsearch mock
-        verify(spiedUserSearchRepository, times(1)).delete(user);
+        verify(spiedUserSearchRepository, times(1)).deleteFromIndex(user);
     }
 
     @Test
+    @Transactional
     void assertThatNotActivatedUsersWithNullActivationKeyCreatedBefore3DaysAreNotDeleted() {
         Instant now = Instant.now();
+        when(dateTimeProvider.getNow()).thenReturn(Optional.of(now.minus(4, ChronoUnit.DAYS)));
         user.setActivated(false);
-        User dbUser = userRepository.save(user).block();
+        User dbUser = userRepository.saveAndFlush(user);
         dbUser.setCreatedDate(now.minus(4, ChronoUnit.DAYS));
-        userRepository.save(user).block();
-        LocalDateTime threeDaysAgo = LocalDateTime.ofInstant(now.minus(3, ChronoUnit.DAYS), ZoneOffset.UTC);
-        List<User> users = userRepository
-            .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(threeDaysAgo)
-            .collectList()
-            .block();
+        userRepository.saveAndFlush(user);
+        Instant threeDaysAgo = now.minus(3, ChronoUnit.DAYS);
+        List<User> users = userRepository.findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(threeDaysAgo);
         assertThat(users).isEmpty();
         userService.removeNotActivatedUsers();
-        Optional<User> maybeDbUser = userRepository.findById(dbUser.getId()).blockOptional();
+        Optional<User> maybeDbUser = userRepository.findById(dbUser.getId());
         assertThat(maybeDbUser).contains(dbUser);
 
         // Verify Elasticsearch mock
-        verify(spiedUserSearchRepository, never()).delete(user);
+        verify(spiedUserSearchRepository, never()).deleteFromIndex(user);
     }
 }

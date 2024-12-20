@@ -1,7 +1,4 @@
-# This configuration makes broad assumptions about intended use
-# It's designed to work in development environment with dev script environment
-# variables. Note that one carefully and check if you have missing keys in
-# your environment
+# This configuration is intended for development purpose, it's **your** responsibility to harden it for production
 version: '3.3'
 networks:
   calvary-erp-network:

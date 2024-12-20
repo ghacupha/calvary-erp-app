@@ -1,3 +1,4 @@
 org.springframework.test.context.ContextCustomizerFactory = io.github.erp.\
     config.SqlTestContainersSpringContextCustomizerFactory,io.github.erp.config.\
-    TestContainersSpringContextCustomizerFactory
+    TestContainersSpringContextCustomizerFactory,io.github.erp.config.\
+    RedisTestContainersSpringContextCustomizerFactory

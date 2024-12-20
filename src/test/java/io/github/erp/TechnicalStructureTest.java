@@ -9,7 +9,7 @@ import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
-@AnalyzeClasses(packagesOf = CalvaryErpApiApp.class, importOptions = DoNotIncludeTests.class)
+@AnalyzeClasses(packagesOf = CalvaryErpApp.class, importOptions = DoNotIncludeTests.class)
 class TechnicalStructureTest {
 
     // prettier-ignore
@@ -30,7 +30,7 @@ class TechnicalStructureTest {
         .whereLayer("Persistence").mayOnlyBeAccessedByLayers("Service", "Security", "Web", "Config")
         .whereLayer("Domain").mayOnlyBeAccessedByLayers("Persistence", "Service", "Security", "Web", "Config")
 
-        .ignoreDependency(belongToAnyOf(CalvaryErpApiApp.class), alwaysTrue())
+        .ignoreDependency(belongToAnyOf(CalvaryErpApp.class), alwaysTrue())
         .ignoreDependency(alwaysTrue(), belongToAnyOf(
             io.github.erp.config.Constants.class,
             io.github.erp.config.ApplicationProperties.class

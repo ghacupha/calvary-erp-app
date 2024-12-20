@@ -57,12 +57,19 @@ spring:
           - git-branch=${git.branch:}
       host: localhost
       port: 8500
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${LOCAL_CALVARY_PG_SERVER}/calvaryErpAppDev
+    username: ${ERP_SYSTEM_EMAIL_USER}
+    password: ${ERP_SYSTEM_EMAIL_PASSWORD}
+    hikari:
+      poolName: Hikari
+      auto-commit: false
   elasticsearch:
-    uris: ${SPRING_DATA_JEST_URI_DEV_CALVARY} #uris: http://localhost:9301
+    uris: http://localhost:9301
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev #, faker
-    url: ${LOCAL_CALVARY_PG_SERVER}/calvaryErpApiDev
   mail:
     host: smtp.gmail.com
     port: 587
@@ -78,10 +85,6 @@ spring:
             trust: smtp.gmail.com
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
-  r2dbc:
-    url: ${LOCAL_CALVARY_R2DBC_URL}/calvaryErpApiDev
-    username: ${CALVARY_PG_DATABASE_DEV_USER}
-    password: ${CALVARY_PG_DATABASE_DEV_PASSWORD}
   thymeleaf:
     cache: false
 
@@ -97,10 +100,14 @@ server:
 # ===================================================================
 
 jhipster:
+  cache: # Cache configuration
+    hazelcast: # Hazelcast distributed cache
+      time-to-live-seconds: 3600
+      backup-count: 1
   # CORS is only enabled by default with the "dev" profile
   cors:
     # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
-    allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000,http://localhost:4200,https://localhost:4200'
+    allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000'
     # Enable CORS when running in GitHub Codespaces
     allowed-origin-patterns: 'https://*.githubpreview.dev'
     allowed-methods: '*'
@@ -112,7 +119,7 @@ jhipster:
     authentication:
       jwt:
         # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)
-        base64-secret: Y2I2MTJiMTlhMDRjZDdlNTQ3MmFiYzkwMzY4ODgyYWZhODdmMmJjZGY3N2JmODNiMjgyYzhmMjRiYjMwNmUwZWUwZTZkYjQ2YzhhMDUyM2YxNjVhMGJiMWQyNGY4ZDczZjBjOGY0M2UwZjQ1MDM2NTAyNmE2ODJkMDRiOTVlYzY=
+        base64-secret: MzIzMzdlNTI2Y2Q4ZDI3ZjljN2YzYzY3NzYwYzgwMjg4MzQxNjNkYzExOTRlOTViYzc5MDhmODRhMGNmZGY0ZGIxZGQwN2Y4MjNmZTU5MTZjNDhkNmViNjZlOGFkMmI2ZTQ5NmIxZTM5MTllN2M1MzA3MWI4YTczYTE2YTk2NjU=
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000

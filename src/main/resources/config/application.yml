@@ -235,5 +235,4 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-application:
-  version: 0.0.1-SNAPSHOT
+# application:

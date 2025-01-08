@@ -8,4 +8,4 @@
  ######  ##     ## ########    ###    ##     ## ##     ##    ##        ######     ##     ######     ##    ######## ##     ##  ######
 
 ${AnsiColor.BRIGHT_BLUE}:: JHipster 🤓  :: Running Spring Boot ${spring-boot.version} :: Startup profile(s) ${spring.profiles.active} ::
-:: Calvary ERP Ver ${application.version}
+

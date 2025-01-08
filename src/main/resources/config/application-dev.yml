@@ -60,8 +60,8 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: ${LOCAL_CALVARY_PG_SERVER}/calvaryErpAppDev
-    username: ${ERP_SYSTEM_EMAIL_USER}
-    password: ${ERP_SYSTEM_EMAIL_PASSWORD}
+    username: ${PG_DATABASE_DEV_USER}
+    password: ${PG_DATABASE_DEV_PASSWORD}
     hikari:
       poolName: Hikari
       auto-commit: false

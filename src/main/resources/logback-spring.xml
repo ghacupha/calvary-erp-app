@@ -29,6 +29,7 @@
 
     <logger name="io.github.erp" level="INFO"/>
 
+    <logger name="javax.management.remote" level="WARN"/>
     <logger name="angus.activation" level="WARN"/>
     <logger name="jakarta.activation" level="WARN"/>
     <logger name="jakarta.mail" level="WARN"/>

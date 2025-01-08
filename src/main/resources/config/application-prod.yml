@@ -45,9 +45,9 @@ spring:
       port: 8500
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/calvaryErpApp
-    username: calvaryErpApp
-    password: password
+    url: ${LOCAL_CALVARY_PG_SERVER}/calvaryErpApp
+    username: ${PG_DATABASE_PROD_USER}
+    password: ${PG_DATABASE_PROD_PASSWORD}
     hikari:
       poolName: Hikari
       auto-commit: false

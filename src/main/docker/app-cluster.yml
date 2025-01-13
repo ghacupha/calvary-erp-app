@@ -1,0 +1,100 @@
+# This configuration is intended for development purpose, it's **your** responsibility to harden it for production
+version: '3.3'
+services:
+  consul:
+    image: docker.io/bitnami/consul:1.20.0
+    # If you want to expose these ports outside your dev PC,
+    # remove the "127.0.0.1:" prefix
+    ports:
+      - 8300:8300
+      - 8500:8500
+      - 8600:8600
+    command: consul agent -dev -ui -client 0.0.0.0 -log-level=INFO
+    labels:
+      org.springframework.boot.ignore: true
+    networks:
+      - calvary-erp-network
+
+  consul-config-loader:
+    image: jhipster/consul-config-loader:v0.4.1
+    volumes:
+      - ./central-server-config:/config
+    environment:
+      - INIT_SLEEP_SECONDS=5
+      - CONSUL_URL=consul
+      - CONSUL_PORT=8500
+      # Uncomment to load configuration into Consul from a Git repository
+      # as configured in central-server-config/git2consul.json
+      # Also set SPRING_CLOUD_CONSUL_CONFIG_FORMAT=files on your apps
+      # - CONFIG_MODE=git
+    labels:
+      org.springframework.boot.ignore: true
+    networks:
+      - calvary-erp-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.4
+    volumes:
+      - ./search-index-directory:/usr/share/elasticsearch/data
+    ports:
+      - 9301:9200
+    environment:
+      - 'ES_JAVA_OPTS=-Xms256m -Xmx256m'
+      - 'discovery.type=single-node'
+      - 'xpack.security.enabled=false'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://10.60.27.22:9301/_cluster/health?wait_for_status=green&timeout=20s']
+      interval: 5s
+      timeout: 20s
+      retries: 10
+    networks:
+      - calvary-erp-network
+
+  calvary-erp-app:
+    image: ghacupha/calvary-erp-app:0.0.1-SNAPSHOT
+    volumes:
+      - ./logs/:/logs/
+      - ./reports-directory/:/reports-directory/
+      - ./generated-reports/:/generated-reports/
+      - ./business-documents/:/business-documents/
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - JHIPSTER_SLEEP=30
+      - MAVEN_OPTS=-Dspring.profiles.active
+      - SPRING_PROFILES_ACTIVE=prod,api-docs
+      - LOCAL_CALVARY_PG_SERVER=${LOCAL_CALVARY_PG_SERVER}
+      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_R2DBC_URL=${LOCAL_R2DBC_URL}/calvaryErpApp
+      - SPRING_LIQUIBASE_URL=${LOCAL_PG_SERVER}/calvaryErpApp
+      - SERVER_API_DOCKER_DEPLOY_HOST=http://10.60.27.22
+      - SPRING_ELASTICSEARCH_URIS=${SERVER_API_DOCKER_DEPLOY_HOST}:9301
+      - SPRING_ELASTICSEARCH_REST_URIS=http://elasticsearch:9301
+      - SPRING_DATA_JEST_URI_PROD_CALVARY=http://elasticsearch:9301
+      - SPRING_DATA_JEST_URI_DEV_CALVARY=http://elasticsearch:9301
+      - PG_DATABASE_PROD_PASSWORD=${PG_DATABASE_PROD_PASSWORD}
+      - PG_DATABASE_PROD_USER=${PG_DATABASE_PROD_USER}
+      - PG_DATABASE_DEV_PASSWORD=${PG_DATABASE_DEV_PASSWORD}
+      - PG_DATABASE_DEV_USER=${PG_DATABASE_DEV_USER}
+      - SANDBOX_INSTANCE_URLS=http://localhost:8388,http://10.60.27.22:8388,http://localhost:8385
+    ports:
+      - 8385:8385
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8385/management/health
+      interval: 5s
+      timeout: 5s
+      retries: 100
+    depends_on:
+      - consul
+      - elasticsearch
+    networks:
+      - calvary-erp-network
+
+networks:
+  calvary-erp-network:
+    driver: bridge

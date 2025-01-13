@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -75,6 +76,11 @@ public class CalvaryErpApp {
         String protocol = Optional.ofNullable(env.getProperty("server.ssl.key-store")).map(key -> "https").orElse("http");
         String applicationName = env.getProperty("spring.application.name");
         String serverPort = env.getProperty("server.port");
+        String databasePath = env.getProperty("spring.datasource.url");
+        String elasticsearchHost = env.getProperty("spring.elasticsearch.uris");
+        String consulHost = Objects.requireNonNull(env.getProperty("spring.cloud.consul.host")).concat(
+            ":" + env.getProperty("spring.cloud.consul.port")
+        );
         String contextPath = Optional.ofNullable(env.getProperty("server.servlet.context-path"))
             .filter(StringUtils::isNotBlank)
             .orElse("/");
@@ -93,6 +99,9 @@ public class CalvaryErpApp {
             \tLocal: \t\t{}://localhost:{}{}
             \tExternal: \t{}://{}:{}{}
             \tProfile(s): \t{}
+            \tDatabase: \t{}
+            \tElastic Search Host: \t{}
+            \tService Discovery Host: \t{}
             ----------------------------------------------------------""",
             applicationName,
             protocol,
@@ -102,7 +111,10 @@ public class CalvaryErpApp {
             hostAddress,
             serverPort,
             contextPath,
-            env.getActiveProfiles().length == 0 ? env.getDefaultProfiles() : env.getActiveProfiles()
+            env.getActiveProfiles().length == 0 ? env.getDefaultProfiles() : env.getActiveProfiles(),
+            databasePath,
+            elasticsearchHost,
+            consulHost
         );
     }
 }

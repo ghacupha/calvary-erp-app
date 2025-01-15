@@ -136,3 +136,6 @@ jhipster:
 # ===================================================================
 
 # application:
+app:
+  SandboxInstance:
+    urls: ${SANDBOX_INSTANCE_CALVARY_URLS}

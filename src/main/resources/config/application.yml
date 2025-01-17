@@ -216,14 +216,14 @@ jhipster:
   api-docs:
     default-include-pattern: /api/**
     management-include-pattern: /management/**
-    title: Calvary Erp App API
-    description: Calvary Erp App API documentation
+    title: Calvary Erp API
+    description: Calvary Erp API documentation
     version: 0.0.1
     terms-of-service-url:
     contact-name:
     contact-url:
     contact-email:
-    license: unlicensed
+    license: GPLv3
     license-url:
   security:
 # ===================================================================

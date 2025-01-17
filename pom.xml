@@ -711,7 +711,7 @@
                                 <arg>/entrypoint.sh</arg>
                             </entrypoint>
                             <ports>
-                                <port>8385</port>
+                                <port>${env.CERP_SYSTEM_DEV_PORT}</port>
                                 <port>5701/udp</port>
                             </ports>
                             <environment>
@@ -906,11 +906,11 @@
                 <spring.profiles.active>dev${profile.tls}${profile.no-liquibase}</spring.profiles.active>
             </properties>
             <dependencies>
-                <dependency>
+                <!--<dependency>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-devtools</artifactId>
                     <optional>true</optional>
-                </dependency>
+                </dependency>-->
             </dependencies>
         </profile>
         <profile>

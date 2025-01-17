@@ -1,5 +1,6 @@
 package io.github.erp.service;
 
+import com.hazelcast.core.IFunction;
 import io.github.erp.config.Constants;
 import io.github.erp.domain.Authority;
 import io.github.erp.domain.User;
@@ -28,6 +29,7 @@ import tech.jhipster.security.RandomUtil;
 /**
  * Service class for managing users.
  */
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 @Service
 @Transactional
 public class UserService {
@@ -298,7 +300,15 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
-        return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByLogin);
+        var user = SecurityUtils.getCurrentUserLogin()
+            .flatMap(login -> {
+                LOG.debug("Searching for User: {}", login);
+                return userRepository.findOneWithAuthoritiesByLogin(login);
+            });
+
+        user.ifPresent(presentUser -> LOG.debug("User: {} data fetched successfully", presentUser.getLogin()));
+
+        return user;
     }
 
     /**

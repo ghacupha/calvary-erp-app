@@ -27,6 +27,13 @@ To start your application in the dev profile, run:
 ./mvnw
 ```
 
+#### Environment
+
+- CERP_SYSTEM_DEV_PORT = 8386
+
+This is necessary to facilitate parallel runs with the docker container which is running on 8385. So the
+server if it is running on the same host, must be configured to a different port
+
 For further instructions on how to develop with JHipster, have a look at [Using JHipster in development][].
 
 ## Building for production

@@ -36,6 +36,7 @@ spring:
     restart:
       enabled: true
       additional-exclude: static/**
+      # exclude: ../../../../src/main/java/io/github/erp/domain/**
     livereload:
       enabled: false # we use Webpack dev server + BrowserSync for livereload
   jackson:

@@ -1,5 +1,6 @@
 package io.github.erp.web.rest;
 
+import io.github.erp.business.service.ERPUserService;
 import io.github.erp.domain.User;
 import io.github.erp.repository.UserRepository;
 import io.github.erp.security.SecurityUtils;
@@ -36,11 +37,11 @@ public class AccountResource {
 
     private final UserRepository userRepository;
 
-    private final UserService userService;
+    private final ERPUserService userService;
 
     private final MailService mailService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    public AccountResource(UserRepository userRepository, ERPUserService userService, MailService mailService) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;

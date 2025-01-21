@@ -1,4 +1,4 @@
-package io.github.erp.service;
+package io.github.erp.business.service;
 
 import io.github.erp.business.ApplicationUserUserMapping;
 import io.github.erp.config.Constants;
@@ -14,12 +14,20 @@ import io.github.erp.repository.search.ApplicationUserSearchRepository;
 import io.github.erp.repository.search.UserSearchRepository;
 import io.github.erp.security.AuthoritiesConstants;
 import io.github.erp.security.SecurityUtils;
+import io.github.erp.service.EmailAlreadyUsedException;
+import io.github.erp.service.EntitySubscriptionService;
+import io.github.erp.service.InvalidPasswordException;
+import io.github.erp.service.UsernameAlreadyUsedException;
 import io.github.erp.service.dto.AdminUserDTO;
 import io.github.erp.service.dto.UserDTO;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -40,9 +48,9 @@ import tech.jhipster.security.RandomUtil;
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 @Service
 @Transactional
-public class UserService {
+public class ERPUserService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ERPUserService.class);
 
     private final UserRepository userRepository;
 
@@ -62,7 +70,7 @@ public class UserService {
     private final ApplicationUserSearchRepository applicationUserSearchRepository;
     private final ApplicationUserUserMapping applicationUserUserMapping;
 
-    public UserService(
+    public ERPUserService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         UserSearchRepository userSearchRepository,
@@ -165,6 +173,10 @@ public class UserService {
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
         userSearchRepository.save(newUser);
+
+        // todo check for duplication of functions here
+        createApplicationUser(newUser, userDTO).ifPresent(applicationUserSearchRepository::index);
+
         this.clearUserCaches(newUser);
         LOG.debug("Created Information for User: {}", newUser);
         return newUser;

@@ -165,6 +165,25 @@ public class ERPInstitutionResource {
     }
 
     /**
+     * {@code GET  /institutions} : get all the institutions.
+     *
+     * @param pageable the pagination information.
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of institutions in body.
+     */
+    @GetMapping("registered")
+    public ResponseEntity<List<InstitutionDTO>> getAllRegisteredInstitutions(
+        InstitutionCriteria criteria,
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
+    ) {
+        LOG.debug("REST request to get Institutions by criteria: {}", criteria);
+
+        Page<InstitutionDTO> page = institutionQueryService.findByCriteria(criteria, pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
      * {@code GET  /institutions/count} : count all the institutions.
      *
      * @param criteria the criteria which the requested entities should match.

@@ -1,0 +1,19 @@
+--- src/main/webapp/app/account/register/register.component.ts
++++ src/main/webapp/app/account/register/register.component.ts
+@@ -27,6 +27,7 @@ import PasswordStrengthBarComponent from '../password/password-strength-bar/pass
+ import { RegisterService } from './register.service';
+ import { InstitutionService } from '../../entities/institution/service/institution.service';
+ import { IInstitution } from 'app/entities/institution/institution.model';
++import { ERPInstitutionService } from 'app/extensions/registration/institution/service/institution.service';
+ 
+ @Component({
+   standalone: true,
+@@ -82,7 +83,7 @@ export default class RegisterComponent implements AfterViewInit, OnInit {
+   });
+ 
+   private readonly registerService = inject(RegisterService);
+-  private institutionService = inject(InstitutionService);
++  private institutionService = inject(ERPInstitutionService);
+ 
+   ngOnInit(): void {
+     this.loadInstitutions();

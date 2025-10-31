@@ -1,0 +1,23 @@
+{
+  "generator-jhipster": {
+    "baseName": "CalvaryErp",
+    "clientFramework": "angular",
+    "clientTestFrameworks": [],
+    "clientTheme": "journal",
+    "clientThemeVariant": "dark",
+    "creationTimestamp": 1736334647289,
+    "devServerPort": 4200,
+    "enableTranslation": false,
+    "entities": ["ApplicationUser", "EntitySubscription", "Institution"],
+    "jhipsterVersion": "8.7.3",
+    "microfrontend": null,
+    "microfrontends": [],
+    "nativeLanguage": "en",
+    "searchEngine": "elasticsearch",
+    "serverPort": 8385,
+    "skipServer": true,
+    "testFrameworks": [],
+    "websocket": "spring-websocket",
+    "withAdminUi": true
+  }
+}

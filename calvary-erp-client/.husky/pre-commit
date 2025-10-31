@@ -1,0 +1,8 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+powershell -ExecutionPolicy Bypass -File ./.patches/Apply-Patches.ps1
+
+npx lint-staged
+
+

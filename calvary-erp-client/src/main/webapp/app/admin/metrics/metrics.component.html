@@ -1,0 +1,69 @@
+<!--
+
+    Erp System - Mark I No 2 (Beniah Series) Client 0.0.1-SNAPSHOT
+    Copyright © 2022 - 2025 Edwin Njeru (mailnjeru@gmail.com)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<div>
+  <h2>
+    <span id="metrics-page-heading" data-cy="metricsPageHeading">Application Metrics</span>
+
+    <button class="btn btn-primary float-end" (click)="refresh()"><fa-icon icon="sync"></fa-icon> <span>Refresh</span></button>
+  </h2>
+
+  <h3>JVM Metrics</h3>
+
+  @let metricsRef = metrics();
+  @if (metricsRef && !updatingMetrics()) {
+    <div class="row">
+      <jhi-jvm-memory class="col-md-4" [updating]="updatingMetrics()" [jvmMemoryMetrics]="metricsRef.jvm"></jhi-jvm-memory>
+
+      <jhi-jvm-threads class="col-md-4" [threads]="threads()"></jhi-jvm-threads>
+
+      <jhi-metrics-system class="col-md-4" [updating]="updatingMetrics()" [systemMetrics]="metricsRef.processMetrics"></jhi-metrics-system>
+    </div>
+  }
+
+  @if (metricsRef?.garbageCollector; as metricsRefGarbageCollector) {
+    <jhi-metrics-garbagecollector
+      [updating]="updatingMetrics()"
+      [garbageCollectorMetrics]="metricsRefGarbageCollector"
+    ></jhi-metrics-garbagecollector>
+  }
+
+  @if (updatingMetrics()) {
+    <div class="well well-lg">Updating...</div>
+  }
+
+  @if (metricsRef?.['http.server.requests']; as metricsRefHttpServerRequests) {
+    <jhi-metrics-request [updating]="updatingMetrics()" [requestMetrics]="metricsRefHttpServerRequests"></jhi-metrics-request>
+  }
+
+  @if (metricsRef?.services; as metricsRefServices) {
+    <jhi-metrics-endpoints-requests
+      [updating]="updatingMetrics()"
+      [endpointsRequestsMetrics]="metricsRefServices"
+    ></jhi-metrics-endpoints-requests>
+  }
+
+  @if (metricsRef?.cache; as metricsRefCache) {
+    <jhi-metrics-cache [updating]="updatingMetrics()" [cacheMetrics]="metricsRefCache"></jhi-metrics-cache>
+  }
+
+  @if (metricsRef && metricsKeyExistsAndObjectNotEmpty('databases')) {
+    <jhi-metrics-datasource [updating]="updatingMetrics()" [datasourceMetrics]="metricsRef.databases"></jhi-metrics-datasource>
+  }
+</div>

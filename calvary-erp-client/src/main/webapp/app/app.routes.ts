@@ -52,6 +52,14 @@ const routes: Routes = [
     loadComponent: () => import('./login/login.component'),
     title: 'ERP| Login',
   },
+  {
+    path: 'questionnaires/welfare-membership',
+    loadComponent: () =>
+      import('./extensions/questionnaire/welfare-questionnaire/welfare-questionnaire.component').then(
+        m => m.WelfareQuestionnaireComponent,
+      ),
+    title: 'ERP| Welfare Membership Questionnaire',
+  },
   ...erpExtensionRoutes,
   {
     path: '',

@@ -120,6 +120,7 @@ export default tseslint.config(
     files: ['src/main/webapp/**/*.spec.ts'],
     rules: {
       '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
     },
   },
   {

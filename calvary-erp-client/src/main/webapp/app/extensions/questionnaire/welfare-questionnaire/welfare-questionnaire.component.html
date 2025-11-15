@@ -1,0 +1,165 @@
+<!--
+
+    Erp System - Mark I No 2 (Beniah Series) Client 0.0.1-SNAPSHOT
+    Copyright © 2022 - 2025 Edwin Njeru (mailnjeru@gmail.com)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<section class="container py-4" *ngIf="!loading(); else loadingIndicator">
+  <ng-container *ngIf="questionnaire() as definition; else loadError">
+    <h1 class="mb-3">{{ definition.title }}</h1>
+    <p class="lead" *ngIf="definition.description">{{ definition.description }}</p>
+
+    <form class="needs-validation" novalidate *ngIf="form() as questionnaireForm" [formGroup]="questionnaireForm" (ngSubmit)="submit()">
+      <ng-container *ngFor="let section of definition.sections">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2 class="h5 mb-0">{{ section.title }}</h2>
+          <p class="mb-0 text-muted" *ngIf="section.description">{{ section.description }}</p>
+        </div>
+        <div class="card-body">
+          <ng-container *ngIf="section.repeatable; else singleSection">
+            <div class="d-flex flex-column gap-3" [formArrayName]="section.id">
+              <div
+                class="border rounded p-3 position-relative"
+                *ngFor="let group of sectionArray(section.id)?.controls; let index = index; trackBy: trackByIndex"
+                [formGroupName]="index"
+              >
+                <ng-container *ngFor="let question of section.questions">
+                  <div class="mb-3">
+                    <label class="form-label" [for]="section.id + '-' + question.id + '-' + index">
+                      {{ question.label }}
+                      <span class="text-danger" *ngIf="question.required">*</span>
+                    </label>
+                    <ng-container [ngSwitch]="question.type">
+                      <textarea
+                        *ngSwitchCase="'textarea'"
+                        class="form-control"
+                        [id]="section.id + '-' + question.id + '-' + index"
+                        [placeholder]="question.placeholder"
+                        [formControlName]="question.id"
+                        rows="4"
+                      ></textarea>
+                      <select
+                        *ngSwitchCase="'select'"
+                        class="form-select"
+                        [id]="section.id + '-' + question.id + '-' + index"
+                        [formControlName]="question.id"
+                      >
+                        <option [ngValue]="null" disabled *ngIf="!question.required">Select an option</option>
+                        <option *ngFor="let option of question.options ?? []" [value]="option.value">{{ option.label }}</option>
+                      </select>
+                      <input
+                        *ngSwitchDefault
+                        class="form-control"
+                        [id]="section.id + '-' + question.id + '-' + index"
+                        [type]="question.type === 'textarea' ? 'text' : question.type"
+                        [placeholder]="question.placeholder"
+                        [formControlName]="question.id"
+                      />
+                    </ng-container>
+                    <small class="form-text text-muted" *ngIf="question.hint">{{ question.hint }}</small>
+                    <div class="invalid-feedback d-block" *ngIf="errorMessage(questionControl(group, question), question) as error">
+                      {{ error }}
+                    </div>
+                  </div>
+                </ng-container>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm position-absolute end-0 top-0 m-3"
+                  *ngIf="canRemove(section, index)"
+                  (click)="removeSection(section, index)"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline-primary mt-3" *ngIf="showAddButton(section)" (click)="addSection(section)">
+              Add another
+            </button>
+          </ng-container>
+          <ng-template #singleSection>
+            <div class="row g-3" [formGroup]="sectionGroup(section.id)">
+              <ng-container *ngFor="let question of section.questions">
+                <div class="col-12">
+                  <label class="form-label" [for]="section.id + '-' + question.id">
+                    {{ question.label }}
+                    <span class="text-danger" *ngIf="question.required">*</span>
+                  </label>
+                  <ng-container [ngSwitch]="question.type">
+                    <textarea
+                      *ngSwitchCase="'textarea'"
+                      class="form-control"
+                      [id]="section.id + '-' + question.id"
+                      [placeholder]="question.placeholder"
+                      [formControlName]="question.id"
+                      rows="4"
+                    ></textarea>
+                    <select
+                      *ngSwitchCase="'select'"
+                      class="form-select"
+                      [id]="section.id + '-' + question.id"
+                      [formControlName]="question.id"
+                    >
+                      <option [ngValue]="null" disabled *ngIf="!question.required">Select an option</option>
+                      <option *ngFor="let option of question.options ?? []" [value]="option.value">{{ option.label }}</option>
+                    </select>
+                    <input
+                      *ngSwitchDefault
+                      class="form-control"
+                      [id]="section.id + '-' + question.id"
+                      [type]="question.type === 'textarea' ? 'text' : question.type"
+                      [placeholder]="question.placeholder"
+                      [formControlName]="question.id"
+                    />
+                  </ng-container>
+                  <small class="form-text text-muted" *ngIf="question.hint">{{ question.hint }}</small>
+                  <div
+                    class="invalid-feedback d-block"
+                    *ngIf="sectionGroup(section.id) as group; errorMessage(questionControl(group, question), question) as error"
+                  >
+                    {{ error }}
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+      </ng-container>
+
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-primary" type="submit" [disabled]="questionnaireForm.invalid || submitting()">
+        <span *ngIf="submitting(); else submitText">Submitting…</span>
+        <ng-template #submitText>{{ submitLabel() }}</ng-template>
+      </button>
+      <div *ngIf="submissionSucceeded()" class="text-success">Thank you for your submission.</div>
+      <div *ngIf="submissionFailed()" class="text-danger">There was a problem submitting the form.</div>
+      </div>
+    </form>
+  </ng-container>
+</section>
+
+<ng-template #loadingIndicator>
+  <div class="d-flex justify-content-center align-items-center py-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading…</span>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #loadError>
+  <div class="alert alert-warning">The questionnaire is unavailable at the moment.</div>
+</ng-template>

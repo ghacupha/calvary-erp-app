@@ -46,6 +46,14 @@
             </span>
           </a>
         </li>
+        <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <a class="nav-link" routerLink="/questionnaires/welfare-membership" (click)="collapseNavbar()">
+            <span>
+              <fa-icon icon="clipboard-list"></fa-icon>
+              <span>Welfare Membership</span>
+            </span>
+          </a>
+        </li>
         <!-- jhipster-needle-add-element-to-menu - JHipster will add new menu items here -->
         @if (account() !== null) {
           <li

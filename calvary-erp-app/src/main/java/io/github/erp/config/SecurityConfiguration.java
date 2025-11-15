@@ -48,6 +48,8 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/api/activate")).permitAll()
                     .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
                     .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/erp/welfare/questionnaire")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/erp/welfare/questionnaire/submissions")).permitAll()
                     .requestMatchers(mvc.pattern("/api/erp/institutions/**")).permitAll()
                     .requestMatchers(mvc.pattern("/api/erp/entity-subscriptions/**")).permitAll()
                     .requestMatchers(mvc.pattern("/api/erp/application-users/**")).permitAll()

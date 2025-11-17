@@ -2,6 +2,10 @@ package io.github.erp.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -40,6 +44,20 @@ public final class TestUtil {
             byteArray[i] = Byte.parseByte(data, 2);
         }
         return byteArray;
+    }
+
+    /**
+     * Convert an object to JSON byte array.
+     *
+     * @param object the object to convert.
+     * @return the JSON byte array.
+     */
+    public static byte[] convertObjectToJsonBytes(Object object) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        mapper.registerModule(new JavaTimeModule());
+        return mapper.writeValueAsBytes(object);
     }
 
     /**

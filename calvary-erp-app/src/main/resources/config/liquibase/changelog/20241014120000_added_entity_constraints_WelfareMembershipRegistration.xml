@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity WelfareMembershipRegistration and WelfareMemberDependent.
+    -->
+    <changeSet id="20241014120000-2" author="jhipster">
+        <addForeignKeyConstraint
+            baseColumnNames="registration_id"
+            baseTableName="welfare_member_dependent"
+            constraintName="fk_welfare_member_dependent__registration_id"
+            referencedColumnNames="id"
+            referencedTableName="welfare_membership_registration"/>
+    </changeSet>
+</databaseChangeLog>

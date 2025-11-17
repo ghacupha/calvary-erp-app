@@ -1,0 +1,20 @@
+--- src/main/webapp/app/entities/application-user/update/application-user-update.component.ts
++++ src/main/webapp/app/entities/application-user/update/application-user-update.component.ts
+@@ -16,7 +16,7 @@
+ /// along with this program. If not, see <http://www.gnu.org/licenses/>.
+ ///
+ 
+-import { Component, OnInit, inject } from '@angular/core';
++import { Component, Input, OnInit, TemplateRef, inject } from '@angular/core';
+ import { HttpResponse } from '@angular/common/http';
+ import { ActivatedRoute } from '@angular/router';
+ import { Observable } from 'rxjs';
+@@ -40,6 +40,8 @@ import { ApplicationUserFormGroup, ApplicationUserFormService } from './applicat
+   imports: [SharedModule, FormsModule, ReactiveFormsModule],
+ })
+ export class ApplicationUserUpdateComponent implements OnInit {
++  @Input() customActivatedTemplate?: TemplateRef<any> | null = null;
++
+   isSaving = false;
+   applicationUser: IApplicationUser | null = null;
+ 

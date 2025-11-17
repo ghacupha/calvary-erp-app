@@ -1,0 +1,41 @@
+# This configuration is intended for development purpose, it's **your** responsibility to harden it for production
+version: '3.3'
+services:
+  calvary-gateway-api:
+    image: ghacupha/calvary-erp-app:0.0.1-SNAPSHOT
+    volumes:
+      - ./logs/:/logs/
+      - ./reports-directory/:/reports-directory/
+      - ./generated-reports/:/generated-reports/
+      - ./business-documents/:/business-documents/
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - MAVEN_OPTS=-Dspring.profiles.active
+      - SPRING_PROFILES_ACTIVE=prod,api-docs
+      - LOCAL_CALVARY_PG_SERVER=${LOCAL_CALVARY_PG_SERVER}
+      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_R2DBC_URL=${LOCAL_R2DBC_URL}/calvaryErpApp
+      - SPRING_LIQUIBASE_URL=${LOCAL_PG_SERVER}/calvaryErpApp
+      - SPRING_ELASTICSEARCH_URIS=http://10.60.27.22:9865
+      - SPRING_ELASTICSEARCH_REST_URIS=http://10.60.27.22:9865
+      - SPRING_DATA_JEST_URI_PROD_CALVARY=http://10.60.27.22:9865
+      - SPRING_DATA_JEST_URI_DEV_CALVARY=http://10.60.27.22:9865
+      - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=http://10.60.27.22:9092
+      - PG_DATABASE_PROD_PASSWORD=${PG_DATABASE_PROD_PASSWORD}
+      - PG_DATABASE_PROD_USER=${PG_DATABASE_PROD_USER}
+      - PG_DATABASE_DEV_PASSWORD=${PG_DATABASE_DEV_PASSWORD}
+      - PG_DATABASE_DEV_USER=${PG_DATABASE_DEV_USER}
+      - SANDBOX_INSTANCE_URLS=http://localhost:8388,http://10.60.27.22:8388,http://localhost:8385
+    ports:
+      - 8385:8385
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8385/management/health
+      interval: 5s
+      timeout: 5s
+      retries: 40

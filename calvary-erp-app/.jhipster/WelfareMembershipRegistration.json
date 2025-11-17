@@ -1,0 +1,79 @@
+{
+  "annotations": {
+    "changelogDate": "20241014120000"
+  },
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "applicantFirstName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "applicantLastName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "applicantEmail",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "email"]
+    },
+    {
+      "fieldName": "phoneNumber",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "addressLine1",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "addressLine2",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "city",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "stateProvince",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "postalCode",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "membershipType",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "householdIncome",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "notes",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "submittedAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "WelfareMembershipRegistration",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "relationshipName": "dependents",
+      "otherEntityName": "welfareMemberDependent",
+      "otherEntityField": "fullName",
+      "relationshipType": "one-to-many",
+      "relationshipSide": "left"
+    }
+  ],
+  "service": "serviceImpl"
+}

@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "application.version",
+      "type": "java.lang.String",
+      "description": "Description for application.version."
+    },
+    {
+      "name": "app.SandboxInstance.urls",
+      "type": "java.lang.String",
+      "description": "Description for app.SandboxInstance.urls."
+    }
+  ]
+}

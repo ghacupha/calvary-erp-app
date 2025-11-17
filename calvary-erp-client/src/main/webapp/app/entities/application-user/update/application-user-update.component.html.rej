@@ -1,0 +1,33 @@
+--- src/main/webapp/app/entities/application-user/update/application-user-update.component.html
++++ src/main/webapp/app/entities/application-user/update/application-user-update.component.html
+@@ -60,10 +60,26 @@
+           <input type="text" class="form-control" name="email" id="field_email" data-cy="email" formControlName="email" />
+         </div>
+ 
+-        <div class="mb-3">
+-          <label class="form-label" for="field_activated">Activated</label>
+-          <input type="checkbox" class="form-check" name="activated" id="field_activated" data-cy="activated" formControlName="activated" />
+-        </div>
++        <!-- Activated field block -->
++        <ng-container *ngIf="!customActivatedTemplate; else customTemplate">
++          <div class="mb-3">
++            <label class="form-label" for="field_activated">Activated</label>
++            <input
++              type="checkbox"
++              class="form-check"
++              name="activated"
++              id="field_activated"
++              data-cy="activated"
++              formControlName="activated"
++            />
++          </div>
++        </ng-container>
++        <ng-template #customTemplate>
++          <!-- Render the custom activated field template -->
++          <ng-container
++            *ngTemplateOutlet="customActivatedTemplate ? customActivatedTemplate : null; context: { editForm: editForm }"
++          ></ng-container>
++        </ng-template>
+ 
+         <div class="mb-3">
+           <label class="form-label" for="field_langKey">Lang Key</label>

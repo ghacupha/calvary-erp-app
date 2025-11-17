@@ -68,7 +68,7 @@ export class WelfareQuestionnaireComponent implements OnInit {
     this.formBuilderService.removeSectionItem(form, section.id, index, section.minimumEntries ?? 1);
   }
 
-  sectionArray(sectionId: string): FormArray | null {
+  sectionArray(sectionId: string): FormArray<FormGroup> | null {
     const form = this.form();
 
     if (!form) {
@@ -77,7 +77,7 @@ export class WelfareQuestionnaireComponent implements OnInit {
 
     const control = form.get(sectionId);
 
-    return control instanceof FormArray ? control : null;
+    return control instanceof FormArray ? (control as FormArray<FormGroup>) : null;
   }
 
   sectionGroup(sectionId: string): FormGroup | null {

@@ -31,15 +31,81 @@
         </div>
         <div class="card-body">
           <ng-container *ngIf="section.repeatable; else singleSection">
-            <div class="d-flex flex-column gap-3" [formArrayName]="section.id">
-              <div
-                class="border rounded p-3 position-relative"
-                *ngFor="let group of sectionArray(section.id)?.controls; let index = index; trackBy: trackByIndex"
-                [formGroupName]="index"
+            <ng-container *ngIf="sectionArray(section.id) as sectionEntries">
+              <div class="d-flex flex-column gap-3" [formArrayName]="section.id">
+                <div
+                  class="border rounded p-3 position-relative"
+                  *ngFor="let group of sectionEntries.controls; let index = index; trackBy: trackByIndex"
+                  [formGroupName]="index"
+                >
+                  <ng-container *ngFor="let question of section.questions">
+                    <div class="mb-3">
+                      <label class="form-label" [for]="section.id + '-' + question.id + '-' + index">
+                        {{ question.label }}
+                        <span class="text-danger" *ngIf="question.required">*</span>
+                      </label>
+                      <ng-container [ngSwitch]="question.type">
+                        <textarea
+                          *ngSwitchCase="'textarea'"
+                          class="form-control"
+                          [id]="section.id + '-' + question.id + '-' + index"
+                          [placeholder]="question.placeholder"
+                          [formControlName]="question.id"
+                          rows="4"
+                        ></textarea>
+                        <select
+                          *ngSwitchCase="'select'"
+                          class="form-select"
+                          [id]="section.id + '-' + question.id + '-' + index"
+                          [formControlName]="question.id"
+                        >
+                          <option [ngValue]="null" disabled *ngIf="!question.required">Select an option</option>
+                          <option *ngFor="let option of question.options ?? []" [value]="option.value">{{ option.label }}</option>
+                        </select>
+                        <input
+                          *ngSwitchDefault
+                          class="form-control"
+                          [id]="section.id + '-' + question.id + '-' + index"
+                          [type]="question.type === 'textarea' ? 'text' : question.type"
+                          [placeholder]="question.placeholder"
+                          [formControlName]="question.id"
+                        />
+                      </ng-container>
+                      <small class="form-text text-muted" *ngIf="question.hint">{{ question.hint }}</small>
+                      <div
+                        class="invalid-feedback d-block"
+                        *ngIf="errorMessage(questionControl(group, question), question) as error"
+                      >
+                        {{ error }}
+                      </div>
+                    </div>
+                  </ng-container>
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger btn-sm position-absolute end-0 top-0 m-3"
+                    *ngIf="canRemove(section, index)"
+                    (click)="removeSection(section, index)"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="btn btn-outline-primary mt-3"
+                *ngIf="showAddButton(section)"
+                (click)="addSection(section)"
               >
+                Add another
+              </button>
+            </ng-container>
+          </ng-container>
+          <ng-template #singleSection>
+            <ng-container *ngIf="sectionGroup(section.id) as sectionGroupForm">
+              <div class="row g-3" [formGroup]="sectionGroupForm">
                 <ng-container *ngFor="let question of section.questions">
-                  <div class="mb-3">
-                    <label class="form-label" [for]="section.id + '-' + question.id + '-' + index">
+                  <div class="col-12">
+                    <label class="form-label" [for]="section.id + '-' + question.id">
                       {{ question.label }}
                       <span class="text-danger" *ngIf="question.required">*</span>
                     </label>
@@ -47,7 +113,7 @@
                       <textarea
                         *ngSwitchCase="'textarea'"
                         class="form-control"
-                        [id]="section.id + '-' + question.id + '-' + index"
+                        [id]="section.id + '-' + question.id"
                         [placeholder]="question.placeholder"
                         [formControlName]="question.id"
                         rows="4"
@@ -55,7 +121,7 @@
                       <select
                         *ngSwitchCase="'select'"
                         class="form-select"
-                        [id]="section.id + '-' + question.id + '-' + index"
+                        [id]="section.id + '-' + question.id"
                         [formControlName]="question.id"
                       >
                         <option [ngValue]="null" disabled *ngIf="!question.required">Select an option</option>
@@ -64,77 +130,23 @@
                       <input
                         *ngSwitchDefault
                         class="form-control"
-                        [id]="section.id + '-' + question.id + '-' + index"
+                        [id]="section.id + '-' + question.id"
                         [type]="question.type === 'textarea' ? 'text' : question.type"
                         [placeholder]="question.placeholder"
                         [formControlName]="question.id"
                       />
                     </ng-container>
                     <small class="form-text text-muted" *ngIf="question.hint">{{ question.hint }}</small>
-                    <div class="invalid-feedback d-block" *ngIf="errorMessage(questionControl(group, question), question) as error">
+                    <div
+                      class="invalid-feedback d-block"
+                      *ngIf="errorMessage(questionControl(sectionGroupForm, question), question) as error"
+                    >
                       {{ error }}
                     </div>
                   </div>
                 </ng-container>
-                <button
-                  type="button"
-                  class="btn btn-outline-danger btn-sm position-absolute end-0 top-0 m-3"
-                  *ngIf="canRemove(section, index)"
-                  (click)="removeSection(section, index)"
-                >
-                  Remove
-                </button>
               </div>
-            </div>
-            <button type="button" class="btn btn-outline-primary mt-3" *ngIf="showAddButton(section)" (click)="addSection(section)">
-              Add another
-            </button>
-          </ng-container>
-          <ng-template #singleSection>
-            <div class="row g-3" [formGroup]="sectionGroup(section.id)">
-              <ng-container *ngFor="let question of section.questions">
-                <div class="col-12">
-                  <label class="form-label" [for]="section.id + '-' + question.id">
-                    {{ question.label }}
-                    <span class="text-danger" *ngIf="question.required">*</span>
-                  </label>
-                  <ng-container [ngSwitch]="question.type">
-                    <textarea
-                      *ngSwitchCase="'textarea'"
-                      class="form-control"
-                      [id]="section.id + '-' + question.id"
-                      [placeholder]="question.placeholder"
-                      [formControlName]="question.id"
-                      rows="4"
-                    ></textarea>
-                    <select
-                      *ngSwitchCase="'select'"
-                      class="form-select"
-                      [id]="section.id + '-' + question.id"
-                      [formControlName]="question.id"
-                    >
-                      <option [ngValue]="null" disabled *ngIf="!question.required">Select an option</option>
-                      <option *ngFor="let option of question.options ?? []" [value]="option.value">{{ option.label }}</option>
-                    </select>
-                    <input
-                      *ngSwitchDefault
-                      class="form-control"
-                      [id]="section.id + '-' + question.id"
-                      [type]="question.type === 'textarea' ? 'text' : question.type"
-                      [placeholder]="question.placeholder"
-                      [formControlName]="question.id"
-                    />
-                  </ng-container>
-                  <small class="form-text text-muted" *ngIf="question.hint">{{ question.hint }}</small>
-                  <div
-                    class="invalid-feedback d-block"
-                    *ngIf="sectionGroup(section.id) as group; errorMessage(questionControl(group, question), question) as error"
-                  >
-                    {{ error }}
-                  </div>
-                </div>
-              </ng-container>
-            </div>
+            </ng-container>
           </ng-template>
         </div>
       </div>

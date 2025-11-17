@@ -1,13 +1,13 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="CalvaryErpApp" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-    <envs>
-      <env name="LOCAL_CALVARY_PG_SERVER" value="jdbc:postgresql://10.60.27.22:5434" />
-    </envs>
     <option name="envFilePaths">
       <option value="$PROJECT_DIR$/.env" />
     </option>
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
     <module name="calvary-erp-app" />
+    <selectedOptions>
+      <option name="environmentVariables" />
+    </selectedOptions>
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.erp.CalvaryErpApp" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />

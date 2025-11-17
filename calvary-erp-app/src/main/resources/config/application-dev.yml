@@ -67,7 +67,7 @@ spring:
       poolName: Hikari
       auto-commit: false
   elasticsearch:
-    uris: http://localhost:9301
+    uris: ${SPRING_DATA_JEST_URI:- http://localhost:9301}
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev #, faker

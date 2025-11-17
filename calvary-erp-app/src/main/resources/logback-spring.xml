@@ -13,19 +13,25 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
-    <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
-    <!--
-    <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
-
-    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-        <queueSize>512</queueSize>
-        <appender-ref ref="FILE"/>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>${LOG_DIR}/${springApplicationName}.log</file>
+      <encoder>
+        <pattern>${FILE_LOG_PATTERN}</pattern>
+      </encoder>
+      <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+        <fileNamePattern>${LOG_DIR}/archive/%d{yyyy/MM}/${springApplicationName}-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+        <maxFileSize>${LOG_MAX_FILE_SIZE:-10MB}</maxFileSize>
+        <maxHistory>${LOG_MAX_HISTORY:-30}</maxHistory>
+        <totalSizeCap>${LOG_TOTAL_SIZE_CAP:-10GB}</totalSizeCap>
+        <cleanHistoryOnStart>${LOG_CLEAN_HISTORY_ON_START:-true}</cleanHistoryOnStart>
+      </rollingPolicy>
     </appender>
 
-    <root level="${logging.level.root}">
-        <appender-ref ref="ASYNC"/>
-    </root>
-    -->
+    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+      <queueSize>${LOG_ASYNC_QUEUE_SIZE:-512}</queueSize>
+      <discardingThreshold>0</discardingThreshold>
+      <appender-ref ref="FILE" />
+    </appender>
 
     <logger name="io.github.erp" level="INFO"/>
 
@@ -43,7 +49,8 @@
     <logger name="io.searchbox" level="WARN"/>
     <logger name="io.undertow" level="WARN"/>
     <logger name="io.undertow.websockets.jsr" level="ERROR"/>
-    <logger name="org.apache" level="WARN"/>
+    <logger name="org.apache" level="INFO"/>
+    <logger name="org.apache.http" level="DEBUG"/>
     <logger name="org.apache.catalina.startup.DigesterFactory" level="OFF"/>
     <logger name="org.bson" level="WARN"/>
     <logger name="org.elasticsearch" level="WARN"/>
